@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-
 import { deleteExpiredLinks } from "~/server/api/link";
 import { deleteExpiredUserLinks } from "~/server/api/user-link";
 

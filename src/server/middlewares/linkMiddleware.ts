@@ -1,10 +1,9 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { eq, sql } from "drizzle-orm";
-
 import { db } from "~/server/db";
 import { links } from "~/server/db/schema";
 import { redis } from "~/server/redis";
+import { eq, sql } from "drizzle-orm";
 
 export async function linkMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,9 +26,13 @@ export async function linkMiddleware(request: NextRequest) {
       .set({ clicks: sql`${links.clicks} + 1` })
       .where(eq(links.slug, slug))
       .run()
-      .catch((err: unknown) => console.error("[linkMiddleware] click increment failed", err));
+      .catch((err: unknown) =>
+        console.error("[linkMiddleware] click increment failed", err),
+      );
 
-    return NextResponse.redirect(decodeURIComponent(encodedUrl), { status: 302 });
+    return NextResponse.redirect(decodeURIComponent(encodedUrl), {
+      status: 302,
+    });
   }
 
   return NextResponse.next();

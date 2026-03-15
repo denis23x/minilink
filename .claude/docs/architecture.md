@@ -22,12 +22,14 @@
 ## Redirect Flow (Middleware)
 
 Every request hits `src/middleware.ts` → `linkMiddleware`. The matcher **excludes**:
+
 - `/api/` routes
 - `/_next/` (Next.js internals)
 - `/_proxy/`, `/_static`, `/_vercel` (Vercel internals)
 - Static files (e.g. `/favicon.ico`, `*.xml`, `*.txt`)
 
 For all other paths:
+
 1. Extract slug from pathname (e.g. `/abc123`)
 2. Look up slug in **Upstash Redis** (primary fast path) and **atomically increment `clicks`** in DB — both in parallel
 3. If URL found → `302` redirect to decoded URL
@@ -45,20 +47,20 @@ src/app/
 
 ## Next.js Config (`next.config.js`)
 
-| Setting | Value | Effect |
-| ------- | ----- | ------ |
-| `experimental.ppr` | `true` | Partial Prerendering enabled — static shell + dynamic `<Suspense>` boundaries streamed |
-| `images.remotePatterns` | `t3.gstatic.com` | Required for `next/image` to load favicons in `LinkCard` |
-| `logging.fetches.fullUrl` | `true` | Logs full URLs for all fetch calls in dev |
+| Setting                   | Value            | Effect                                                                                 |
+| ------------------------- | ---------------- | -------------------------------------------------------------------------------------- |
+| `experimental.ppr`        | `true`           | Partial Prerendering enabled — static shell + dynamic `<Suspense>` boundaries streamed |
+| `images.remotePatterns`   | `t3.gstatic.com` | Required for `next/image` to load favicons in `LinkCard`                               |
+| `logging.fetches.fullUrl` | `true`           | Logs full URLs for all fetch calls in dev                                              |
 
 ## External Services
 
-| Service        | Purpose                                             |
-| -------------- | --------------------------------------------------- |
-| Turso          | SQLite edge database (via `@libsql/client`)         |
-| Upstash Redis  | Slug → URL store; guest link TTL (24h)              |
-| NextAuth.js    | OAuth authentication (GitHub, Google)               |
-| Vercel         | Hosting, CI/CD, Analytics, daily cron trigger       |
+| Service       | Purpose                                       |
+| ------------- | --------------------------------------------- |
+| Turso         | SQLite edge database (via `@libsql/client`)   |
+| Upstash Redis | Slug → URL store; guest link TTL (24h)        |
+| NextAuth.js   | OAuth authentication (GitHub, Google)         |
+| Vercel        | Hosting, CI/CD, Analytics, daily cron trigger |
 
 ## Environment Variables
 

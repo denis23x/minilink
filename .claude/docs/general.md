@@ -27,7 +27,7 @@
 
 ## Comments
 
-- Write comments for *why*, not *what*
+- Write comments for _why_, not _what_
 - Complex logic must have a comment explaining the approach
 - TODO comments must include context: `// TODO: describe the issue`
 

@@ -7,11 +7,11 @@ There are no unit, integration, or E2E tests in the codebase.
 
 ## Recommended Stack (if tests are added)
 
-| Type                | Tool                            |
-| ------------------- | ------------------------------- |
-| Unit / Integration  | Vitest + React Testing Library  |
-| E2E                 | Playwright                      |
-| API / data mocking  | MSW (Mock Service Worker)       |
+| Type               | Tool                           |
+| ------------------ | ------------------------------ |
+| Unit / Integration | Vitest + React Testing Library |
+| E2E                | Playwright                     |
+| API / data mocking | MSW (Mock Service Worker)      |
 
 ## Suggested Commands (once configured)
 

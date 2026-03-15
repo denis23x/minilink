@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: ISC
  */
 
-import React from 'react';
-import qrcodegen from './qrcodegen';
+import React from "react";
+import qrcodegen from "./qrcodegen";
 
-type Modules = ReturnType<qrcodegen.QrCode['getModules']>;
-type Excavation = {x: number; y: number; w: number; h: number};
-type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
-type CrossOrigin = 'anonymous' | 'use-credentials' | '' | undefined;
+type Modules = ReturnType<qrcodegen.QrCode["getModules"]>;
+type Excavation = { x: number; y: number; w: number; h: number };
+type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
+type CrossOrigin = "anonymous" | "use-credentials" | "" | undefined;
 
 type ERROR_LEVEL_MAPPED_TYPE = {
   [index in ErrorCorrectionLevel]: qrcodegen.QrCode.Ecc;
@@ -139,9 +139,9 @@ type QRPropsCanvas = QRProps & React.CanvasHTMLAttributes<HTMLCanvasElement>;
 type QRPropsSVG = QRProps & React.SVGAttributes<SVGSVGElement>;
 
 const DEFAULT_SIZE = 128;
-const DEFAULT_LEVEL: ErrorCorrectionLevel = 'L';
-const DEFAULT_BGCOLOR = '#FFFFFF';
-const DEFAULT_FGCOLOR = '#000000';
+const DEFAULT_LEVEL: ErrorCorrectionLevel = "L";
+const DEFAULT_BGCOLOR = "#FFFFFF";
+const DEFAULT_FGCOLOR = "#000000";
 const DEFAULT_INCLUDEMARGIN = false;
 const DEFAULT_MINVERSION = 1;
 
@@ -163,7 +163,7 @@ function generatePath(modules: Modules, margin: number = 0): string {
         // M0 0h7v1H0z injects the space with the move and drops the comma,
         // saving a char per operation
         ops.push(
-          `M${start + margin} ${y + margin}h${x - start}v1H${start + margin}z`
+          `M${start + margin} ${y + margin}h${x - start}v1H${start + margin}z`,
         );
         start = null;
         return;
@@ -184,7 +184,7 @@ function generatePath(modules: Modules, margin: number = 0): string {
           ops.push(
             `M${start + margin},${y + margin} h${x + 1 - start}v1H${
               start + margin
-            }z`
+            }z`,
           );
         }
         return;
@@ -195,7 +195,7 @@ function generatePath(modules: Modules, margin: number = 0): string {
       }
     });
   });
-  return ops.join('');
+  return ops.join("");
 }
 
 // We could just do this in generatePath, except that we want to support
@@ -218,7 +218,7 @@ function getImageSettings(
   cells: Modules,
   size: number,
   margin: number,
-  imageSettings?: ImageSettings
+  imageSettings?: ImageSettings,
 ): null | {
   x: number;
   y: number;
@@ -252,12 +252,12 @@ function getImageSettings(
     let floorY = Math.floor(y);
     let ceilW = Math.ceil(w + x - floorX);
     let ceilH = Math.ceil(h + y - floorY);
-    excavation = {x: floorX, y: floorY, w: ceilW, h: ceilH};
+    excavation = { x: floorX, y: floorY, w: ceilW, h: ceilH };
   }
 
   const crossOrigin = imageSettings.crossOrigin;
 
-  return {x, y, h, w, excavation, opacity, crossOrigin};
+  return { x, y, h, w, excavation, opacity, crossOrigin };
 }
 
 function getMarginSize(includeMargin: boolean, marginSize?: number): number {
@@ -298,11 +298,11 @@ function useQRCode({
       minVersion,
       undefined,
       undefined,
-      boostLevel
+      boostLevel,
     );
   }, [value, level, minVersion, boostLevel]);
 
-  const {cells, margin, numCells, calculatedImageSettings} =
+  const { cells, margin, numCells, calculatedImageSettings } =
     React.useMemo(() => {
       let cells = qrcode.getModules();
 
@@ -312,7 +312,7 @@ function useQRCode({
         cells,
         size,
         margin,
-        imageSettings
+        imageSettings,
       );
       return {
         cells,
@@ -360,7 +360,7 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
       imageSettings,
       ...extraProps
     } = props;
-    const {style, ...otherProps} = extraProps;
+    const { style, ...otherProps } = extraProps;
     const imgSrc = imageSettings?.src;
     const _canvas = React.useRef<HTMLCanvasElement | null>(null);
     const _image = React.useRef<HTMLImageElement>(null);
@@ -369,13 +369,13 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
     const setCanvasRef = React.useCallback(
       (node: HTMLCanvasElement | null) => {
         _canvas.current = node;
-        if (typeof forwardedRef === 'function') {
+        if (typeof forwardedRef === "function") {
           forwardedRef(node);
         } else if (forwardedRef) {
           forwardedRef.current = node;
         }
       },
-      [forwardedRef]
+      [forwardedRef],
     );
 
     // We're just using this state to trigger rerenders when images load. We
@@ -384,7 +384,7 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isImgLoaded, setIsImageLoaded] = React.useState(false);
 
-    const {margin, cells, numCells, calculatedImageSettings} = useQRCode({
+    const { margin, cells, numCells, calculatedImageSettings } = useQRCode({
       value,
       level,
       minVersion,
@@ -401,7 +401,7 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
       if (_canvas.current != null) {
         const canvas = _canvas.current;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         if (!ctx) {
           return;
         }
@@ -419,7 +419,7 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
           if (calculatedImageSettings.excavation != null) {
             cellsToDraw = excavateModules(
               cells,
-              calculatedImageSettings.excavation
+              calculatedImageSettings.excavation,
             );
           }
         }
@@ -461,7 +461,7 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
             calculatedImageSettings.x + margin,
             calculatedImageSettings.y + margin,
             calculatedImageSettings.w,
-            calculatedImageSettings.h
+            calculatedImageSettings.h,
           );
         }
       }
@@ -473,14 +473,14 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
       setIsImageLoaded(false);
     }, [imgSrc]);
 
-    const canvasStyle = {height: size, width: size, ...style};
+    const canvasStyle = { height: size, width: size, ...style };
     let img = null;
     if (imgSrc != null) {
       img = (
         <img
           src={imgSrc}
           key={imgSrc}
-          style={{display: 'none'}}
+          style={{ display: "none" }}
           onLoad={() => {
             setIsImageLoaded(true);
           }}
@@ -502,9 +502,9 @@ const QRCodeCanvas = React.forwardRef<HTMLCanvasElement, QRPropsCanvas>(
         {img}
       </>
     );
-  }
+  },
 );
-QRCodeCanvas.displayName = 'QRCodeCanvas';
+QRCodeCanvas.displayName = "QRCodeCanvas";
 
 const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
   function QRCodeSVG(props, forwardedRef) {
@@ -523,7 +523,7 @@ const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
       ...otherProps
     } = props;
 
-    const {margin, cells, numCells, calculatedImageSettings} = useQRCode({
+    const { margin, cells, numCells, calculatedImageSettings } = useQRCode({
       value,
       level,
       minVersion,
@@ -540,7 +540,7 @@ const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
       if (calculatedImageSettings.excavation != null) {
         cellsToDraw = excavateModules(
           cells,
-          calculatedImageSettings.excavation
+          calculatedImageSettings.excavation,
         );
       }
 
@@ -574,7 +574,8 @@ const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
         viewBox={`0 0 ${numCells} ${numCells}`}
         ref={forwardedRef}
         role="img"
-        {...otherProps}>
+        {...otherProps}
+      >
         {!!title && <title>{title}</title>}
         <path
           fill={bgColor}
@@ -585,11 +586,11 @@ const QRCodeSVG = React.forwardRef<SVGSVGElement, QRPropsSVG>(
         {image}
       </svg>
     );
-  }
+  },
 );
-QRCodeSVG.displayName = 'QRCodeSVG';
+QRCodeSVG.displayName = "QRCodeSVG";
 
-export {QRCodeCanvas, QRCodeSVG};
+export { QRCodeCanvas, QRCodeSVG };
 
 // ─── Export helpers ───────────────────────────────────────────────────────────
 
@@ -598,50 +599,79 @@ export interface QRExportOptions {
   size?: number;
   bgColor?: string;
   fgColor?: string;
-  level?: 'L' | 'M' | 'Q' | 'H';
+  level?: "L" | "M" | "Q" | "H";
 }
 
-export async function getQRAsCanvas(opts: QRExportOptions): Promise<HTMLCanvasElement> {
-  const { value, size = 1024, bgColor = '#ffffff', fgColor = '#000000', level = 'Q' } = opts;
-  const canvas = document.createElement('canvas');
-  const root = document.createElement('div');
-  root.style.cssText = 'position:absolute;left:-9999px';
+export async function getQRAsCanvas(
+  opts: QRExportOptions,
+): Promise<HTMLCanvasElement> {
+  const {
+    value,
+    size = 1024,
+    bgColor = "#ffffff",
+    fgColor = "#000000",
+    level = "Q",
+  } = opts;
+  const canvas = document.createElement("canvas");
+  const root = document.createElement("div");
+  root.style.cssText = "position:absolute;left:-9999px";
   document.body.appendChild(root);
 
-  const { createRoot } = await import('react-dom/client');
+  const { createRoot } = await import("react-dom/client");
   await new Promise<void>((resolve) => {
     const rRoot = createRoot(root);
     rRoot.render(
       React.createElement(QRCodeCanvas, {
-        value, size, bgColor, fgColor, level,
+        value,
+        size,
+        bgColor,
+        fgColor,
+        level,
         ref: (el: HTMLCanvasElement | null) => {
           if (!el) return;
           canvas.width = el.width;
           canvas.height = el.height;
-          canvas.getContext('2d')?.drawImage(el, 0, 0);
+          canvas.getContext("2d")?.drawImage(el, 0, 0);
           rRoot.unmount();
           document.body.removeChild(root);
           resolve();
         },
-      })
+      }),
     );
   });
   return canvas;
 }
 
 export function getQRAsSVGDataUri(opts: QRExportOptions): string {
-  const { value, size = 1024, bgColor = '#ffffff', fgColor = '#000000', level = 'Q' } = opts;
-  const eccMap = { L: qrcodegen.QrCode.Ecc.LOW, M: qrcodegen.QrCode.Ecc.MEDIUM, Q: qrcodegen.QrCode.Ecc.QUARTILE, H: qrcodegen.QrCode.Ecc.HIGH };
-  const qr = qrcodegen.QrCode.encodeSegments(qrcodegen.QrSegment.makeSegments(value), eccMap[level]);
+  const {
+    value,
+    size = 1024,
+    bgColor = "#ffffff",
+    fgColor = "#000000",
+    level = "Q",
+  } = opts;
+  const eccMap = {
+    L: qrcodegen.QrCode.Ecc.LOW,
+    M: qrcodegen.QrCode.Ecc.MEDIUM,
+    Q: qrcodegen.QrCode.Ecc.QUARTILE,
+    H: qrcodegen.QrCode.Ecc.HIGH,
+  };
+  const qr = qrcodegen.QrCode.encodeSegments(
+    qrcodegen.QrSegment.makeSegments(value),
+    eccMap[level],
+  );
   const numCells = qr.size;
   const margin = 4;
   const totalCells = numCells + margin * 2;
   const parts: string[] = [];
   (qr.getModules() as boolean[][]).forEach((row, rowIdx) => {
     row.forEach((cell, colIdx) => {
-      if (cell) parts.push(`M${colIdx + margin},${rowIdx + margin}h1v1H${colIdx + margin}z`);
+      if (cell)
+        parts.push(
+          `M${colIdx + margin},${rowIdx + margin}h1v1H${colIdx + margin}z`,
+        );
     });
   });
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" height="${size}" width="${size}" viewBox="0 0 ${totalCells} ${totalCells}"><path fill="${bgColor}" d="M0,0 h${totalCells}v${totalCells}H0z"/><path fill="${fgColor}" d="${parts.join('')}" shape-rendering="crispEdges"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" height="${size}" width="${size}" viewBox="0 0 ${totalCells} ${totalCells}"><path fill="${bgColor}" d="M0,0 h${totalCells}v${totalCells}H0z"/><path fill="${fgColor}" d="${parts.join("")}" shape-rendering="crispEdges"/></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }

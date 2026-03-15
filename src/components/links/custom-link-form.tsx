@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { checkSlug } from "~/server/actions/link";
 import { useAction } from "next-safe-action/hooks";
-
 import { useDebounce } from "~/hooks/use-debounce";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { checkSlug } from "~/server/actions/link";
 
 interface CustomLinkFormProps {
   onSlugChange: (slug: string) => void;
   initialSlug?: string;
 }
 
-export function CustomLinkForm({ onSlugChange, initialSlug = "" }: CustomLinkFormProps) {
+export function CustomLinkForm({
+  onSlugChange,
+  initialSlug = "",
+}: CustomLinkFormProps) {
   const [slug, setSlug] = useState(initialSlug);
   const debouncedSlug = useDebounce(slug, 400);
 
@@ -41,11 +43,19 @@ export function CustomLinkForm({ onSlugChange, initialSlug = "" }: CustomLinkFor
         placeholder="my-link"
         value={slug}
         onChange={handleChange}
-        className={isTaken ? "border-destructive" : isAvailable ? "border-green-500" : ""}
+        className={
+          isTaken ? "border-destructive" : isAvailable ? "border-green-500" : ""
+        }
       />
-      {isPending && <p className="text-xs text-muted-foreground">Checking availability…</p>}
-      {!isPending && isTaken && <p className="text-xs text-destructive">Slug is already taken</p>}
-      {!isPending && isAvailable && <p className="text-xs text-green-500">Slug is available</p>}
+      {isPending && (
+        <p className="text-xs text-muted-foreground">Checking availability…</p>
+      )}
+      {!isPending && isTaken && (
+        <p className="text-xs text-destructive">Slug is already taken</p>
+      )}
+      {!isPending && isAvailable && (
+        <p className="text-xs text-green-500">Slug is available</p>
+      )}
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import type { Session } from "next-auth";
-
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 interface ProtectedElementProps {
   session: Session | null;
@@ -8,7 +11,11 @@ interface ProtectedElementProps {
   message?: string;
 }
 
-export function ProtectedElement({ session, children, message = "Sign in to use this feature" }: ProtectedElementProps) {
+export function ProtectedElement({
+  session,
+  children,
+  message = "Sign in to use this feature",
+}: ProtectedElementProps) {
   if (session) return <>{children}</>;
 
   return (

@@ -1,9 +1,12 @@
 import Image from "next/image";
-import { formatDistanceToNowStrict } from "date-fns";
-
 import type { ShortLink } from "~/types";
+import { formatDistanceToNowStrict } from "date-fns";
 import { formatNumber, getBaseUrl } from "~/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { LinkCopyButton } from "~/components/links/link-copy-button";
 import { LinkOptionsDropdown } from "~/components/links/link-options-dropdown";
 
@@ -47,7 +50,9 @@ export function LinkCard({ link }: LinkCardProps) {
         </div>
         <p className="truncate text-xs text-muted-foreground">{decodedUrl}</p>
         {link.description && (
-          <p className="truncate text-xs text-muted-foreground">{link.description}</p>
+          <p className="truncate text-xs text-muted-foreground">
+            {link.description}
+          </p>
         )}
       </div>
 
@@ -59,7 +64,9 @@ export function LinkCard({ link }: LinkCardProps) {
                 {formatDistanceToNowStrict(link.createdAt, { addSuffix: true })}
               </span>
             </TooltipTrigger>
-            <TooltipContent>{link.createdAt.toLocaleDateString()}</TooltipContent>
+            <TooltipContent>
+              {link.createdAt.toLocaleDateString()}
+            </TooltipContent>
           </Tooltip>
         )}
         <LinkCopyButton shortUrl={shortUrl} />

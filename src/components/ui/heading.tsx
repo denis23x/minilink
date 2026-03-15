@@ -14,7 +14,13 @@ const variantStyles: Record<HeadingVariant, string> = {
   h4: "text-lg font-medium",
 };
 
-export function Heading({ variant = "h2", isFirstBlock, className, children, ...props }: HeadingProps) {
+export function Heading({
+  variant = "h2",
+  isFirstBlock,
+  className,
+  children,
+  ...props
+}: HeadingProps) {
   const Tag = variant;
   return (
     <Tag

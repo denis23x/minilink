@@ -1,8 +1,8 @@
 "use client";
 
+import { deleteShortLink } from "~/server/actions/link";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +13,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { deleteShortLink } from "~/server/actions/link";
 
 interface DeleteLinkDialogProps {
   slug: string;
@@ -21,13 +20,18 @@ interface DeleteLinkDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function DeleteLinkDialog({ slug, open, onOpenChange }: DeleteLinkDialogProps) {
+export function DeleteLinkDialog({
+  slug,
+  open,
+  onOpenChange,
+}: DeleteLinkDialogProps) {
   const { execute, isPending } = useAction(deleteShortLink, {
     onSuccess: () => {
       toast.success("Link deleted");
       onOpenChange(false);
     },
-    onError: ({ error }) => toast.error(error.serverError ?? "Failed to delete link"),
+    onError: ({ error }) =>
+      toast.error(error.serverError ?? "Failed to delete link"),
   });
 
   return (
@@ -36,7 +40,8 @@ export function DeleteLinkDialog({ slug, open, onOpenChange }: DeleteLinkDialogP
         <AlertDialogHeader>
           <AlertDialogTitle>Delete link?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete <strong>/{slug}</strong> and cannot be undone.
+            This will permanently delete <strong>/{slug}</strong> and cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

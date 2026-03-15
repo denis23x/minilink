@@ -1,7 +1,6 @@
 import { Suspense } from "react";
-
-import { ThemeToggle } from "~/components/theme-toggle";
 import { UserProfile } from "~/components/auth/user-profile";
+import { ThemeToggle } from "~/components/theme-toggle";
 
 function UserProfileSkeleton() {
   return <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />;

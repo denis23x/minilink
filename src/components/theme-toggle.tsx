@@ -1,9 +1,13 @@
 "use client";
 
 import { useTheme } from "next-themes";
-
 import { Button } from "~/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { Icons } from "~/components/ui/icons";
 
 export function ThemeToggle() {

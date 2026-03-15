@@ -11,6 +11,8 @@ interface LoaderProps {
 
 export function Loader({ className, size = "sm" }: LoaderProps) {
   return (
-    <Icons.loader className={cn(iconVariants({ size }), "animate-spin", className)} />
+    <Icons.loader
+      className={cn(iconVariants({ size }), "animate-spin", className)}
+    />
   );
 }

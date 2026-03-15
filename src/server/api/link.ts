@@ -1,12 +1,11 @@
 import { revalidatePath } from "next/cache";
-import { eq, gt, isNull, sql } from "drizzle-orm";
-
-import type { ShortLink } from "~/types";
-import { GUEST_LINK_EXPIRE_TIME } from "~/lib/config";
-import { nanoid } from "~/lib/utils";
 import { db } from "~/server/db";
 import { links, userLinks } from "~/server/db/schema";
 import { redis } from "~/server/redis";
+import type { ShortLink } from "~/types";
+import { eq, gt, isNull, sql } from "drizzle-orm";
+import { GUEST_LINK_EXPIRE_TIME } from "~/lib/config";
+import { nanoid } from "~/lib/utils";
 
 export async function generateRandomSlug(): Promise<string> {
   const slug = nanoid();
@@ -27,10 +26,13 @@ export async function getLinkBySlug(slug: string) {
   });
 }
 
-export async function getLinksByUserLinkId(userLinkId: string): Promise<ShortLink[]> {
+export async function getLinksByUserLinkId(
+  userLinkId: string,
+): Promise<ShortLink[]> {
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   return db.query.links.findMany({
-    where: (l, { and, eq }) => and(eq(l.userLinkId, userLinkId), gt(l.createdAt, oneDayAgo)),
+    where: (l, { and, eq }) =>
+      and(eq(l.userLinkId, userLinkId), gt(l.createdAt, oneDayAgo)),
   });
 }
 
@@ -51,7 +53,10 @@ export async function generateShortLink({
   const redisOptions = isGuestUser ? { ex: GUEST_LINK_EXPIRE_TIME } : undefined;
 
   await Promise.all([
-    db.insert(links).values({ slug, url: encodedUrl, userLinkId, description }).run(),
+    db
+      .insert(links)
+      .values({ slug, url: encodedUrl, userLinkId, description })
+      .run(),
     db
       .update(userLinks)
       .set({ totalLinks: sql`${userLinks.totalLinks} + 1` })
@@ -64,7 +69,8 @@ export async function generateShortLink({
 export async function deleteLink(slug: string, userLinkId: string) {
   // Verify ownership before deleting
   const link = await db.query.links.findFirst({
-    where: (l, { and, eq: eql }) => and(eql(l.slug, slug), eql(l.userLinkId, userLinkId)),
+    where: (l, { and, eq: eql }) =>
+      and(eql(l.slug, slug), eql(l.userLinkId, userLinkId)),
   });
   if (!link) throw new Error("Link not found or access denied");
 
@@ -74,7 +80,10 @@ export async function deleteLink(slug: string, userLinkId: string) {
   ]);
 }
 
-export async function deleteLinkAndRevalidate(slug: string, userLinkId: string) {
+export async function deleteLinkAndRevalidate(
+  slug: string,
+  userLinkId: string,
+) {
   await deleteLink(slug, userLinkId);
   revalidatePath("/");
 }
@@ -100,17 +109,18 @@ export async function updateLinksByUserLinkId(
 
 export async function deleteExpiredLinks() {
   // Delete links for anonymous userLinks older than 1 day
-  await db
-    .delete(links)
-    .where(
-      sql`${links.userLinkId} IN (
+  await db.delete(links).where(
+    sql`${links.userLinkId} IN (
         SELECT id FROM userLink
         WHERE userId IS NULL
         AND created_at < strftime('%s', 'now', '-1 day')
       )`,
-    );
+  );
 }
 
 // Re-export for use in auth.ts signIn event
-export { getOrCreateUserLinkByUserId, updateUserLink } from "~/server/api/user-link";
+export {
+  getOrCreateUserLinkByUserId,
+  updateUserLink,
+} from "~/server/api/user-link";
 export { getUserLinkById } from "~/server/api/user-link";

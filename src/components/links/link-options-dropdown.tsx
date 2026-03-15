@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useAction } from "next-safe-action/hooks";
+import { editShortLink } from "~/server/actions/link";
 import { useSession } from "next-auth/react";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-
 import type { InsertLinkInput } from "~/lib/validations/link";
 import { Button } from "~/components/ui/button";
 import {
@@ -15,7 +15,6 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Icons, iconVariants } from "~/components/ui/icons";
 import { ProtectedElement } from "~/components/ui/protected-element";
-import { editShortLink } from "~/server/actions/link";
 import { CustomLinkDialog } from "~/components/links/custom-link-dialog";
 import { DeleteLinkDialog } from "~/components/links/delete-link-dialog";
 import { LinkQRCodeDialog } from "~/components/links/link-qrcode-dialog";
@@ -27,14 +26,20 @@ interface LinkOptionsDropdownProps {
   shortUrl: string;
 }
 
-export function LinkOptionsDropdown({ slug, url, description, shortUrl }: LinkOptionsDropdownProps) {
+export function LinkOptionsDropdown({
+  slug,
+  url,
+  description,
+  shortUrl,
+}: LinkOptionsDropdownProps) {
   const { data: session } = useSession();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editSlug, setEditSlug] = useState(slug);
 
   const { execute: executeEdit } = useAction(editShortLink, {
     onSuccess: () => toast.success("Link updated"),
-    onError: ({ error }) => toast.error(error.serverError ?? "Failed to update link"),
+    onError: ({ error }) =>
+      toast.error(error.serverError ?? "Failed to update link"),
   });
 
   function handleEditConfirm(newSlug: string) {
@@ -56,7 +61,10 @@ export function LinkOptionsDropdown({ slug, url, description, shortUrl }: LinkOp
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <ProtectedElement session={session ?? null} message="Sign in to edit links">
+          <ProtectedElement
+            session={session ?? null}
+            message="Sign in to edit links"
+          >
             <DropdownMenuItem asChild>
               <CustomLinkDialog
                 onConfirm={handleEditConfirm}
@@ -92,7 +100,11 @@ export function LinkOptionsDropdown({ slug, url, description, shortUrl }: LinkOp
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DeleteLinkDialog slug={slug} open={deleteOpen} onOpenChange={setDeleteOpen} />
+      <DeleteLinkDialog
+        slug={slug}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+      />
     </>
   );
 }

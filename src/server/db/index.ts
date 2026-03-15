@@ -1,7 +1,6 @@
 import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-
 import * as schema from "~/server/db/schema";
+import { drizzle } from "drizzle-orm/libsql";
 
 const client = createClient({
   url: process.env.TURSO_URL!,

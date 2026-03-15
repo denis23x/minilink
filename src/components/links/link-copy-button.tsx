@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { Button } from "~/components/ui/button";
 import { Icons, iconVariants } from "~/components/ui/icons";
 
@@ -25,11 +24,17 @@ export function LinkCopyButton({ shortUrl }: LinkCopyButtonProps) {
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={handleCopy} aria-label="Copy link">
-      {copied
-        ? <Icons.check className={iconVariants({ size: "sm" })} />
-        : <Icons.copy className={iconVariants({ size: "sm" })} />
-      }
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={handleCopy}
+      aria-label="Copy link"
+    >
+      {copied ? (
+        <Icons.check className={iconVariants({ size: "sm" })} />
+      ) : (
+        <Icons.copy className={iconVariants({ size: "sm" })} />
+      )}
     </Button>
   );
 }

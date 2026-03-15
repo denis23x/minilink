@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { Button } from "~/components/ui/button";
 import {
   ResponsiveDialog,
@@ -22,7 +21,12 @@ interface CustomLinkDialogProps {
   initialSlug?: string;
 }
 
-export function CustomLinkDialog({ onConfirm, onClear, trigger, initialSlug }: CustomLinkDialogProps) {
+export function CustomLinkDialog({
+  onConfirm,
+  onClear,
+  trigger,
+  initialSlug,
+}: CustomLinkDialogProps) {
   const [open, setOpen] = useState(false);
   const [slug, setSlug] = useState(initialSlug ?? "");
 
@@ -50,12 +54,18 @@ export function CustomLinkDialog({ onConfirm, onClear, trigger, initialSlug }: C
           <CustomLinkForm onSlugChange={setSlug} initialSlug={initialSlug} />
         </ResponsiveDialogBody>
         <div className="flex justify-end gap-2 p-4 pt-0">
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleConfirm} disabled={!slug}>Confirm</Button>
+          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm} disabled={!slug}>
+            Confirm
+          </Button>
         </div>
         <ResponsiveDialogFooter>
           <ResponsiveDialogClose>
-            <Button variant="outline" className="w-full">Cancel</Button>
+            <Button variant="outline" className="w-full">
+              Cancel
+            </Button>
           </ResponsiveDialogClose>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

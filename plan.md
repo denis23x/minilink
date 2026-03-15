@@ -12,17 +12,17 @@ Minilink is a URL shortener built on **Next.js App Router** (canary) with a sing
 
 ## Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js App Router (canary), PPR enabled |
-| Language | TypeScript (strict) |
-| Package manager | `pnpm` |
-| Database | Turso (SQLite edge) + Drizzle ORM |
-| Cache / redirects | Upstash Redis |
-| Mutations | `next-safe-action` + Zod |
-| Auth | NextAuth.js v4, Drizzle adapter |
-| UI | shadcn/ui (`new-york`, `neutral`), Tailwind CSS |
-| Hosting | Vercel (cron job for cleanup) |
+| Layer             | Technology                                      |
+| ----------------- | ----------------------------------------------- |
+| Framework         | Next.js App Router (canary), PPR enabled        |
+| Language          | TypeScript (strict)                             |
+| Package manager   | `pnpm`                                          |
+| Database          | Turso (SQLite edge) + Drizzle ORM               |
+| Cache / redirects | Upstash Redis                                   |
+| Mutations         | `next-safe-action` + Zod                        |
+| Auth              | NextAuth.js v4, Drizzle adapter                 |
+| UI                | shadcn/ui (`new-york`, `neutral`), Tailwind CSS |
+| Hosting           | Vercel (cron job for cleanup)                   |
 
 ---
 
@@ -91,9 +91,9 @@ const config = {
     remotePatterns: [{ hostname: "t3.gstatic.com" }],
   },
   logging: { fetches: { fullUrl: true } },
-}
+};
 
-module.exports = config
+module.exports = config;
 ```
 
 ### 1.5 Configure `prettier.config.js`
@@ -104,6 +104,7 @@ React → Next.js → third-party → `~/types/` → `~/lib/` → `~/hooks/` →
 ### 1.6 Configure `.eslintrc.cjs`
 
 Add rules:
+
 - `consistent-type-imports` — enforce `import type { X }` for type-only imports
 - `no-unused-vars` — warn, `_`-prefixed exempt
 - `drizzle/enforce-delete-with-where` — error
@@ -164,12 +165,14 @@ Define all tables:
 **`verificationTokens`** — NextAuth (compound PK: identifier + token, expires) — unused but required by adapter
 
 **`userLinks`** — ownership container:
+
 - `id` TEXT, cuid2, PK
 - `userId` TEXT, FK → users.id, ON DELETE CASCADE, nullable (NULL = guest)
 - `totalLinks` INTEGER, default 0
 - `createdAt` INTEGER (unix epoch)
 
 **`links`** — the short links:
+
 - `slug` TEXT (max 30), PK
 - `userLinkId` TEXT, FK → userLinks.id, ON DELETE CASCADE
 - `description` TEXT (max 255), nullable
@@ -201,8 +204,9 @@ Run `pnpm db:push` to apply the schema to Turso.
 ### 4.1 `src/server/redis.ts`
 
 ```typescript
-import { Redis } from "@upstash/redis"
-export const redis = Redis.fromEnv()
+import { Redis } from "@upstash/redis";
+
+export const redis = Redis.fromEnv();
 ```
 
 `Redis.fromEnv()` automatically reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
@@ -214,6 +218,7 @@ export const redis = Redis.fromEnv()
 ### 5.1 NextAuth config — `src/server/auth.ts`
 
 Configure NextAuth v4 with:
+
 - `adapter`: Drizzle adapter
 - `session.strategy`: `"database"`
 - `providers`: GitHub, Google
@@ -224,6 +229,7 @@ Configure NextAuth v4 with:
 ### 5.2 Sign-in migration event
 
 When a user signs in:
+
 1. Read `user-link-id` cookie from the request
 2. If missing → return early (no guest links to migrate)
 3. If user already has a `userLink`: call `updateLinksByUserLinkId` to reassign anonymous links, then `redis.persist()` on each slug (removes 24h TTL)
@@ -239,16 +245,15 @@ Thin wrapper around `getServerSession(authOptions)` — used in all Server Compo
 
 ```typescript
 // Open to anyone
-export const action = createSafeActionClient()
+export const action = createSafeActionClient();
 
 // Requires NextAuth session — injects { user } into handler context via .use() middleware chaining
-export const authAction = createSafeActionClient()
-  .use(async ({ next }) => {
-    const session = await getServerAuthSession()
-    // Throw MyCustomError (not generic Error) so the message surfaces as result.serverError on the client
-    if (!session) throw new MyCustomError("Unauthorized")
-    return next({ ctx: { user: session.user } })
-  })
+export const authAction = createSafeActionClient().use(async ({ next }) => {
+  const session = await getServerAuthSession();
+  // Throw MyCustomError (not generic Error) so the message surfaces as result.serverError on the client
+  if (!session) throw new MyCustomError("Unauthorized");
+  return next({ ctx: { user: session.user } });
+});
 ```
 
 ---
@@ -280,13 +285,20 @@ All DB + Redis operations live in `src/server/api/`. Never call Drizzle directly
 - `getLinksByUserLinkId(id)` — fetch links created in the last 24h (guest-safe)
 - `generateShortLink({ userLinkId, slug, url, description, isGuestUser })`:
   ```typescript
-  const encodedUrl = encodeURIComponent(url)
-  const redisOptions = isGuestUser ? { ex: GUEST_LINK_EXPIRE_TIME } : undefined
+  const encodedUrl = encodeURIComponent(url);
+  const redisOptions = isGuestUser ? { ex: GUEST_LINK_EXPIRE_TIME } : undefined;
   await Promise.all([
-    db.insert(links).values({ slug, url: encodedUrl, userLinkId, description }).run(),
-    db.update(userLinks).set({ totalLinks: sql`${userLinks.totalLinks} + 1` }).where(eq(userLinks.id, userLinkId)).run(),
+    db
+      .insert(links)
+      .values({ slug, url: encodedUrl, userLinkId, description })
+      .run(),
+    db
+      .update(userLinks)
+      .set({ totalLinks: sql`${userLinks.totalLinks} + 1` })
+      .where(eq(userLinks.id, userLinkId))
+      .run(),
     redis.set(slug.toLowerCase(), encodedUrl, redisOptions),
-  ])
+  ]);
   ```
 - `deleteLink(slug, userLinkId)` — verify ownership → delete from DB + Redis
 - `deleteLinkAndRevalidate(slug, id)` — `deleteLink` + `revalidatePath("/")`
@@ -305,21 +317,24 @@ Define `slugRegex` in this file (or in `src/lib/utils.ts`) — it validates allo
 ```typescript
 // Allows alphanumeric, hyphens, underscores — empty string is permitted so guests
 // can submit slug: "" and let the server auto-generate via generateRandomSlug()
-export const slugRegex = /^[a-zA-Z0-9_-]*$/
+export const slugRegex = /^[a-zA-Z0-9_-]*$/;
 
 export const insertLinkSchema = createInsertSchema(links)
   .pick({ slug: true, url: true, description: true })
   .extend({
     url: z.string().url(),
     // Empty string is valid — server auto-generates when slug === ""
-    slug: z.string().max(30).refine((value) => slugRegex.test(value)),
+    slug: z
+      .string()
+      .max(30)
+      .refine((value) => slugRegex.test(value)),
     description: z.string().max(255).optional(),
-  })
+  });
 
 export const editLinkSchema = z.object({
   slug: z.string(),
   newLink: insertLinkSchema,
-})
+});
 ```
 
 Guest creation passes `slug: ""` — `slugRegex` allows empty string (`*` quantifier), so validation passes. The server calls `generateRandomSlug()` when `slug === ""`.
@@ -335,6 +350,7 @@ All actions live in `src/server/actions/link.ts`. Always call `revalidatePath("/
 Schema: `insertLinkSchema`
 
 Flow:
+
 1. Resolve the final slug first:
    - If `slug === ""` → call `generateRandomSlug()` (nanoid 6-char, retries on Redis collision)
    - Otherwise → use the provided slug as-is
@@ -348,6 +364,7 @@ Flow:
 Schema: `z.object({ slug: z.string() })`
 
 Flow:
+
 1. Verify ownership via session or `user-link-id` cookie
 2. `deleteLinkAndRevalidate(slug, userLinkId)`
 
@@ -356,6 +373,7 @@ Flow:
 Schema: `editLinkSchema`
 
 Flow:
+
 1. `user.id` is guaranteed present from `authAction` context
 2. Fetch the existing link via `getLinkBySlug(slug)` — throw `MyCustomError` if not found
 3. Verify ownership: check that the link's `userLink.userId === user.id` — throw `MyCustomError("Forbidden")` if not
@@ -387,12 +405,14 @@ GET /{slug}
 ```
 
 Short-circuit with `NextResponse.next()` for:
+
 - Requests to `/` (home)
 - Multi-segment paths (more than one `/`)
 
 ### 9.2 `src/middleware.ts`
 
 Export `linkMiddleware` as the default middleware. Configure the matcher to exclude:
+
 - `/api/` routes
 - `/_next/` (Next.js internals)
 - `/_proxy/`, `/_static`, `/_vercel` (Vercel internals)
@@ -405,7 +425,7 @@ Export `linkMiddleware` as the default middleware. Configure the matcher to excl
 ### 10.1 `src/lib/config.ts`
 
 ```typescript
-export const GUEST_LINK_EXPIRE_TIME = 86400  // 24h in seconds
+export const GUEST_LINK_EXPIRE_TIME = 86400; // 24h in seconds
 ```
 
 ### 10.2 `src/lib/utils.ts`
@@ -419,8 +439,13 @@ export const GUEST_LINK_EXPIRE_TIME = 86400  // 24h in seconds
 ### 10.3 `src/types/index.ts`
 
 ```typescript
-export type UserWithLink = typeof users.$inferSelect & { userLink: UserLink | null }
-export type SafeActionError = { serverError?: string; validationErrors?: Record<string, string[]> }
+export type UserWithLink = typeof users.$inferSelect & {
+  userLink: UserLink | null;
+};
+export type SafeActionError = {
+  serverError?: string;
+  validationErrors?: Record<string, string[]>;
+};
 ```
 
 ---
@@ -445,6 +470,7 @@ Note: `pnpm dlx shadcn-ui add drawer` installs `vaul` automatically as a depende
 ### 11.3 `src/styles/globals.css`
 
 Define HSL CSS custom properties for light/dark themes:
+
 - `--background`, `--foreground`, `--card`, `--popover`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--border`, `--input`, `--ring`
 - `--radius: 1rem`
 
@@ -459,6 +485,7 @@ Define HSL CSS custom properties for light/dark themes:
 **`src/components/ui/protected-element.tsx`** — wraps children with a `Tooltip` and disables them when `session` is falsy
 
 **`src/components/ui/responsive-dialog.tsx`** — context-based wrapper:
+
 - Desktop (≥ 768px via `useMediaQuery`): renders Radix `Dialog`
 - Mobile: renders `Drawer` (vaul)
 - Exports: `ResponsiveDialog`, `ResponsiveDialogTrigger`, `ResponsiveDialogContent`, `ResponsiveDialogBody`, `ResponsiveDialogHeader`, `ResponsiveDialogTitle`, `ResponsiveDialogFooter` (mobile only), `ResponsiveDialogClose` (mobile only)
@@ -486,6 +513,7 @@ Define HSL CSS custom properties for light/dark themes:
 **No npm install.** The library is vendored — the source code of `qrcode.react` is copied directly into the project. This avoids a runtime dependency and allows customization without forking.
 
 Copy the source into `src/lib/qrcode/` as two files:
+
 - `qrcodegen.ts` — core QR algorithm; add `/* eslint-disable */` + `// @ts-nocheck` at the top so ESLint and TypeScript never check this file
 - `index.tsx` — React wrapper; exports `QRCodeSVG`, `QRCodeCanvas`, `getQRAsSVGDataUri`, `getQRAsCanvas`
 
@@ -526,6 +554,7 @@ Static footer with links.
 **`src/components/auth/oauth-provider-button.tsx`** — Client Component (`"use client"` required — calls `signIn("github")` / `signIn("google")` from `next-auth/react`); button with provider icon (`Icons.github` / `Icons.google`)
 
 **`src/components/auth/user-profile.tsx`** (async RSC) — reads session:
+
 - If authenticated: shows `Avatar` + `UserProfileDropdown`
 - If not: shows `SigninDialog`
 
@@ -558,6 +587,7 @@ Static footer with links.
 ### 16.4 `LinkList` (async RSC)
 
 Fetch strategy:
+
 - Authenticated: `getUserLinkByUserId(session.user.id)` → all links
 - Guest with cookie: `getLinksByUserLinkId(userLinkIdCookie)` → last 24h only
 - Guest with no links: also fetch `getLinkBySlug("github")` to show example
@@ -567,6 +597,7 @@ Renders each link as `<LinkCard>`. Individual cards are NOT wrapped in their own
 ### 16.5 `LinkCard` (Server Component)
 
 Displays a single link:
+
 - Favicon: `https://t3.gstatic.com/faviconV2?...&url={url}&size=32` (via `next/image`)
 - Click count via `formatNumber()` (compact)
 - Relative time via `date-fns` `formatDistanceToNowStrict`; full date in `Tooltip`
@@ -637,6 +668,7 @@ Authorization: Bearer <CRON_SECRET>
 4. Return `200 { message: "Cleanup complete" }`
 
 Configure in `vercel.json`:
+
 ```json
 {
   "crons": [{ "path": "/api/cron", "schedule": "0 0 * * *" }]
@@ -665,13 +697,14 @@ Configure in `vercel.json`:
 
 No tests are configured yet. When introduced, use:
 
-| Type | Tool |
-|---|---|
+| Type               | Tool                           |
+| ------------------ | ------------------------------ |
 | Unit / Integration | Vitest + React Testing Library |
-| E2E | Playwright |
-| API / data mocking | MSW |
+| E2E                | Playwright                     |
+| API / data mocking | MSW                            |
 
 Priority test targets:
+
 - `src/lib/utils.ts` — `cn()`, `formatNumber()`, `setFormErrors()`, `getBaseUrl()`
 - `src/lib/validations/link.tsx` — schema edge cases
 - `src/server/actions/link.ts` — mock Drizzle + Redis, assert `revalidatePath` calls

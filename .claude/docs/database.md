@@ -11,14 +11,14 @@
 
 ## Tables
 
-| Table             | Description                                          |
-| ----------------- | ---------------------------------------------------- |
-| `user`            | NextAuth users (OAuth accounts)                      |
-| `account`         | OAuth provider accounts (NextAuth adapter)           |
-| `session`         | Database sessions (NextAuth adapter)                 |
-| `verificationToken` | Email verification tokens (unused — OAuth only)    |
-| `userLink`        | Ownership container for links (one per user or guest)|
-| `link`            | The actual short links                               |
+| Table               | Description                                           |
+| ------------------- | ----------------------------------------------------- |
+| `user`              | NextAuth users (OAuth accounts)                       |
+| `account`           | OAuth provider accounts (NextAuth adapter)            |
+| `session`           | Database sessions (NextAuth adapter)                  |
+| `verificationToken` | Email verification tokens (unused — OAuth only)       |
+| `userLink`          | Ownership container for links (one per user or guest) |
+| `link`              | The actual short links                                |
 
 ## Column Conventions
 
@@ -30,31 +30,38 @@
 ## Schema Details
 
 ### `user`
+
 ```typescript
-id: text("id").notNull().primaryKey()          // NextAuth-generated
-name: text("name")
-email: text("email").notNull()
-emailVerified: integer("emailVerified", { mode: "timestamp_ms" })
-image: text("image")
-createdAt: integer("created_at", { mode: "timestamp" })
+id: text("id").notNull().primaryKey(); // NextAuth-generated
+name: text("name");
+email: text("email").notNull();
+emailVerified: integer("emailVerified", { mode: "timestamp_ms" });
+image: text("image");
+createdAt: integer("created_at", { mode: "timestamp" });
 ```
 
 ### `userLink`
+
 ```typescript
-id: text("id").$defaultFn(() => createId()).primaryKey()  // cuid2
-userId: text("userId").references(() => users.id, { onDelete: "cascade" })  // nullable = guest
-totalLinks: integer("total_links").default(0).notNull()
-createdAt: integer("created_at", { mode: "timestamp" })
+id: text("id")
+  .$defaultFn(() => createId())
+  .primaryKey(); // cuid2
+userId: text("userId").references(() => users.id, { onDelete: "cascade" }); // nullable = guest
+totalLinks: integer("total_links").default(0).notNull();
+createdAt: integer("created_at", { mode: "timestamp" });
 ```
 
 ### `link`
+
 ```typescript
-slug: text("slug", { length: 30 }).primaryKey()           // 6-char nanoid (auto) or custom (auth only)
-userLinkId: text("userLinkId").references(() => userLinks.id, { onDelete: "cascade" }).notNull()
-description: text("description", { length: 255 })         // nullable
-url: text("url").notNull()                                 // URL-encoded
-clicks: integer("clicks").default(0).notNull()
-createdAt: integer("created_at", { mode: "timestamp" })
+slug: text("slug", { length: 30 }).primaryKey(); // 6-char nanoid (auto) or custom (auth only)
+userLinkId: text("userLinkId")
+  .references(() => userLinks.id, { onDelete: "cascade" })
+  .notNull();
+description: text("description", { length: 255 }); // nullable
+url: text("url").notNull(); // URL-encoded
+clicks: integer("clicks").default(0).notNull();
+createdAt: integer("created_at", { mode: "timestamp" });
 ```
 
 ## Key Design Points
@@ -71,23 +78,23 @@ createdAt: integer("created_at", { mode: "timestamp" })
 All queries live in `src/server/api/`. Always use the Drizzle `db` client from `~/server/db`:
 
 ```typescript
-import { db } from '~/server/db'
-import { links } from '~/server/db/schema'
-import { eq } from 'drizzle-orm'
+import { db } from "~/server/db";
+import { links } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
 // Fetch
 const result = await db.query.links.findMany({
   where: eq(links.userLinkId, userLinkId),
-})
+});
 
 // Insert
-await db.insert(links).values({ slug, url, userLinkId, description })
+await db.insert(links).values({ slug, url, userLinkId, description });
 
 // Update
-await db.update(links).set({ url: newUrl }).where(eq(links.slug, slug))
+await db.update(links).set({ url: newUrl }).where(eq(links.slug, slug));
 
 // Delete (drizzle ESLint plugin enforces .where() on all deletes)
-await db.delete(links).where(eq(links.slug, slug))
+await db.delete(links).where(eq(links.slug, slug));
 ```
 
 ## Drizzle ESLint Rule

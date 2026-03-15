@@ -13,7 +13,9 @@ export const env = createEnv({
     NEXTAUTH_URL: z.string().url().optional(),
     NEXTAUTH_SECRET: z.string().min(1).optional(),
     DOMAIN_URL: z.string().url().optional(),
-    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
   },
   client: {},
   // UPSTASH_* and CRON_SECRET are read directly via process.env — not validated here

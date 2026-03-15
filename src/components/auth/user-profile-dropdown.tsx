@@ -2,7 +2,6 @@
 
 import type { Session } from "next-auth";
 import { signOut } from "next-auth/react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
@@ -25,8 +24,13 @@ export function UserProfileDropdown({ session }: UserProfileDropdownProps) {
       <DropdownMenuTrigger asChild>
         <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
-            <AvatarFallback>{user.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+            <AvatarImage
+              src={user.image ?? undefined}
+              alt={user.name ?? "User"}
+            />
+            <AvatarFallback>
+              {user.name?.[0]?.toUpperCase() ?? "U"}
+            </AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>

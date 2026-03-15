@@ -1,11 +1,9 @@
-import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
-import type { NextAuthOptions, Session } from "next-auth";
-import { getServerSession } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
-
+import type {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-
 import {
   getOrCreateUserLinkByUserId,
   getUserLinkById,
@@ -15,12 +13,19 @@ import {
 import { createNewUserLink } from "~/server/api/user-link";
 import { db } from "~/server/db";
 import { redis } from "~/server/redis";
+import type { NextAuthOptions, Session } from "next-auth";
+import { getServerSession } from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 const providers: NextAuthOptions["providers"] = [];
 
 if (process.env.GITHUB_ID && process.env.GITHUB_SECRET) {
   providers.push(
-    GitHubProvider({ clientId: process.env.GITHUB_ID, clientSecret: process.env.GITHUB_SECRET }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
   );
 }
 
@@ -64,7 +69,9 @@ export const authOptions: NextAuthOptions = {
 
       if (existingUserLink) {
         // User already has a userLink — reassign guest links to it
-        await updateLinksByUserLinkId(guestUserLinkId, { userLinkId: existingUserLink.id });
+        await updateLinksByUserLinkId(guestUserLinkId, {
+          userLinkId: existingUserLink.id,
+        });
         for (const link of guestUserLink.links) {
           await redis.persist(link.slug.toLowerCase());
         }

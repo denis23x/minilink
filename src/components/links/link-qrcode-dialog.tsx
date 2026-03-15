@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-
+import { getQRAsCanvas, getQRAsSVGDataUri, QRCodeSVG } from "~/lib/qrcode";
 import { Button } from "~/components/ui/button";
 import {
   ResponsiveDialog,
@@ -13,7 +13,6 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from "~/components/ui/responsive-dialog";
-import { QRCodeSVG, getQRAsCanvas, getQRAsSVGDataUri } from "~/lib/qrcode";
 
 interface LinkQRCodeDialogProps {
   shortUrl: string;
@@ -52,7 +51,9 @@ export function LinkQRCodeDialog({ shortUrl, trigger }: LinkQRCodeDialogProps) {
       const canvas = await getQRAsCanvas({ value: shortUrl, size: 1024 });
       canvas.toBlob(async (blob) => {
         if (!blob) throw new Error("Failed to create blob");
-        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        await navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob }),
+        ]);
         toast.success("QR code copied");
       });
     } catch {
@@ -72,14 +73,28 @@ export function LinkQRCodeDialog({ shortUrl, trigger }: LinkQRCodeDialogProps) {
         <ResponsiveDialogBody className="flex flex-col items-center gap-4 p-4">
           <QRCodeSVG value={shortUrl} size={256} level="Q" />
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={copyPng}>Copy PNG</Button>
-            <Button variant="outline" size="sm" onClick={() => download("png")}>PNG</Button>
-            <Button variant="outline" size="sm" onClick={() => download("jpeg")}>JPEG</Button>
-            <Button variant="outline" size="sm" onClick={() => download("svg")}>SVG</Button>
+            <Button variant="outline" size="sm" onClick={copyPng}>
+              Copy PNG
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => download("png")}>
+              PNG
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => download("jpeg")}
+            >
+              JPEG
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => download("svg")}>
+              SVG
+            </Button>
           </div>
         </ResponsiveDialogBody>
         <ResponsiveDialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Close
+          </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
       {/* Hidden anchor for programmatic downloads */}

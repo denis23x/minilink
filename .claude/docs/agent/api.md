@@ -11,12 +11,12 @@ Two action clients in `src/lib/safe-action.ts`:
 
 ### Actions
 
-| Action            | Client       | Schema                           | Description                                  |
-| ----------------- | ------------ | -------------------------------- | -------------------------------------------- |
-| `createShortLink` | `action`     | `insertLinkSchema`               | Creates a link for authenticated or guest    |
-| `deleteShortLink` | `action`     | `z.object({ slug: z.string() })` | Deletes a link (cookie or session)           |
-| `editShortLink`   | `authAction` | `editLinkSchema`                 | Edits slug, URL, description of a link       |
-| `checkSlug`       | `authAction` | `insertLinkSchema.pick({ slug })` | Returns `boolean` — slug availability       |
+| Action            | Client       | Schema                            | Description                               |
+| ----------------- | ------------ | --------------------------------- | ----------------------------------------- |
+| `createShortLink` | `action`     | `insertLinkSchema`                | Creates a link for authenticated or guest |
+| `deleteShortLink` | `action`     | `z.object({ slug: z.string() })`  | Deletes a link (cookie or session)        |
+| `editShortLink`   | `authAction` | `editLinkSchema`                  | Edits slug, URL, description of a link    |
+| `checkSlug`       | `authAction` | `insertLinkSchema.pick({ slug })` | Returns `boolean` — slug availability     |
 
 ### Guest Link Flow
 
@@ -44,9 +44,9 @@ Handled by the `signIn` event in `src/server/auth.ts`:
 
 ## Next.js API Routes
 
-| Method | Path        | Description                                              |
-| ------ | ----------- | -------------------------------------------------------- |
-| `GET`  | `/api/cron` | Daily cleanup; deletes expired guest links + userLinks   |
+| Method | Path        | Description                                            |
+| ------ | ----------- | ------------------------------------------------------ |
+| `GET`  | `/api/cron` | Daily cleanup; deletes expired guest links + userLinks |
 
 ### Cron Authorization
 
@@ -79,7 +79,10 @@ export const insertLinkSchema = createInsertSchema(links)
   .pick({ slug: true, url: true, description: true })
   .extend({
     url: z.string().url(),
-    slug: z.string().max(30).refine((value) => slugRegex.test(value)),
+    slug: z
+      .string()
+      .max(30)
+      .refine((value) => slugRegex.test(value)),
     description: z.string().max(255).optional(),
   });
 
@@ -95,34 +98,34 @@ Guest creation passes `slug: ""` — the server auto-generates a 6-char nanoid s
 
 ### `src/server/api/link.ts`
 
-| Function                   | Description                                                             |
-| -------------------------- | ----------------------------------------------------------------------- |
-| `generateRandomSlug()`     | Generates a unique 6-char nanoid, recursively retries on collision      |
-| `checkSlugExists(slug)`    | Checks **Redis** (`redis.exists`) — returns `true` if slug is taken     |
-| `getLinkBySlug(slug)`      | DB lookup with `COLLATE NOCASE`; returns `ShortLink \| undefined`       |
-| `getLinksByUserLinkId(id)` | Fetch links for a `userLinkId` created in the last 24h (guest-safe)     |
-| `generateShortLink(...)`   | Insert link + increment `totalLinks` + set Redis key — all in `Promise.all` |
-| `deleteLink(slug, userLinkId)` | Verifies ownership, deletes from DB + Redis                         |
-| `deleteLinkAndRevalidate(slug, id)` | Calls `deleteLink` + `revalidatePath("/")` — convenience wrapper |
-| `updateLinkBySlug(slug, data)` | Update link fields in DB; returns updated row                       |
-| `updateLinksByUserLinkId(id, data)` | Bulk-update links by `userLinkId` (used in sign-in migration)  |
-| `deleteExpiredLinks()`     | Raw SQL: delete links for anonymous `userLink`s older than 1 day        |
+| Function                            | Description                                                                 |
+| ----------------------------------- | --------------------------------------------------------------------------- |
+| `generateRandomSlug()`              | Generates a unique 6-char nanoid, recursively retries on collision          |
+| `checkSlugExists(slug)`             | Checks **Redis** (`redis.exists`) — returns `true` if slug is taken         |
+| `getLinkBySlug(slug)`               | DB lookup with `COLLATE NOCASE`; returns `ShortLink \| undefined`           |
+| `getLinksByUserLinkId(id)`          | Fetch links for a `userLinkId` created in the last 24h (guest-safe)         |
+| `generateShortLink(...)`            | Insert link + increment `totalLinks` + set Redis key — all in `Promise.all` |
+| `deleteLink(slug, userLinkId)`      | Verifies ownership, deletes from DB + Redis                                 |
+| `deleteLinkAndRevalidate(slug, id)` | Calls `deleteLink` + `revalidatePath("/")` — convenience wrapper            |
+| `updateLinkBySlug(slug, data)`      | Update link fields in DB; returns updated row                               |
+| `updateLinksByUserLinkId(id, data)` | Bulk-update links by `userLinkId` (used in sign-in migration)               |
+| `deleteExpiredLinks()`              | Raw SQL: delete links for anonymous `userLink`s older than 1 day            |
 
 ### `src/server/api/user-link.ts`
 
-| Function                            | Description                                                     |
-| ----------------------------------- | --------------------------------------------------------------- |
-| `createNewUserLink(userId?)`        | Insert a new `userLink`; `userId` is optional (guest = null)    |
-| `getUserLinkById(id)`               | Fetch `userLink` with related `links` by id                     |
-| `getUserLinkByUserId(userId)`       | Fetch `userLink` with related `links` by `userId`               |
-| `getOrCreateUserLinkByUserId(id)`   | Find or create a `userLink` for an authenticated user           |
-| `getOrCreateUserLinkById(id)`       | Find `userLink` by id or create a fresh anonymous one           |
-| `updateUserLink(id, data)`          | Update `userLink` fields (e.g. assign `userId` on sign-in)      |
-| `setUserLinkIdCookie(id)`           | Set `user-link-id` cookie (30-day expiry, httpOnly, secure prod)|
-| `deleteExpiredUserLinks()`          | Raw SQL: delete anonymous `userLink`s older than 30 days        |
+| Function                          | Description                                                      |
+| --------------------------------- | ---------------------------------------------------------------- |
+| `createNewUserLink(userId?)`      | Insert a new `userLink`; `userId` is optional (guest = null)     |
+| `getUserLinkById(id)`             | Fetch `userLink` with related `links` by id                      |
+| `getUserLinkByUserId(userId)`     | Fetch `userLink` with related `links` by `userId`                |
+| `getOrCreateUserLinkByUserId(id)` | Find or create a `userLink` for an authenticated user            |
+| `getOrCreateUserLinkById(id)`     | Find `userLink` by id or create a fresh anonymous one            |
+| `updateUserLink(id, data)`        | Update `userLink` fields (e.g. assign `userId` on sign-in)       |
+| `setUserLinkIdCookie(id)`         | Set `user-link-id` cookie (30-day expiry, httpOnly, secure prod) |
+| `deleteExpiredUserLinks()`        | Raw SQL: delete anonymous `userLink`s older than 30 days         |
 
 ### `src/server/api/user.ts`
 
-| Function          | Description                                           |
-| ----------------- | ----------------------------------------------------- |
+| Function          | Description                                             |
+| ----------------- | ------------------------------------------------------- |
 | `getUserById(id)` | Fetch `user` with their `userLink` (via Drizzle `with`) |

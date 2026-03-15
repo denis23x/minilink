@@ -1,0 +1,5 @@
+.claude/skills/**
+.next
+.vscode
+
+/node_modules

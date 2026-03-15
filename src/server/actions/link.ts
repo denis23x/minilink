@@ -2,11 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { z } from "zod";
-
-import { MyCustomError, action, authAction } from "~/lib/safe-action";
-import { editLinkSchema, insertLinkSchema } from "~/lib/validations/link";
-import { getServerAuthSession } from "~/server/auth";
 import {
   checkSlugExists,
   deleteLinkAndRevalidate,
@@ -15,8 +10,16 @@ import {
   getLinkBySlug,
   updateLinkBySlug,
 } from "~/server/api/link";
-import { getOrCreateUserLinkById, getOrCreateUserLinkByUserId, setUserLinkIdCookie } from "~/server/api/user-link";
+import {
+  getOrCreateUserLinkById,
+  getOrCreateUserLinkByUserId,
+  setUserLinkIdCookie,
+} from "~/server/api/user-link";
+import { getServerAuthSession } from "~/server/auth";
 import { redis } from "~/server/redis";
+import { z } from "zod";
+import { action, authAction, MyCustomError } from "~/lib/safe-action";
+import { editLinkSchema, insertLinkSchema } from "~/lib/validations/link";
 
 export const createShortLink = action
   .schema(insertLinkSchema)
@@ -28,15 +31,29 @@ export const createShortLink = action
 
     if (session) {
       const userLink = await getOrCreateUserLinkByUserId(session.user.id);
-      if (!userLink) throw new MyCustomError("Failed to get or create user link");
-      await generateShortLink({ userLinkId: userLink.id, slug: finalSlug, url, description, isGuestUser: false });
+      if (!userLink)
+        throw new MyCustomError("Failed to get or create user link");
+      await generateShortLink({
+        userLinkId: userLink.id,
+        slug: finalSlug,
+        url,
+        description,
+        isGuestUser: false,
+      });
     } else {
       const cookieStore = await cookies();
       const cookieId = cookieStore.get("user-link-id")?.value;
       const userLink = await getOrCreateUserLinkById(cookieId ?? "");
-      if (!userLink) throw new MyCustomError("Failed to get or create user link");
+      if (!userLink)
+        throw new MyCustomError("Failed to get or create user link");
       await setUserLinkIdCookie(userLink.id);
-      await generateShortLink({ userLinkId: userLink.id, slug: finalSlug, url, description, isGuestUser: true });
+      await generateShortLink({
+        userLinkId: userLink.id,
+        slug: finalSlug,
+        url,
+        description,
+        isGuestUser: true,
+      });
     }
 
     revalidatePath("/");
@@ -57,7 +74,8 @@ export const deleteShortLink = action
       userLinkId = cookieStore.get("user-link-id")?.value;
     }
 
-    if (!userLinkId) throw new MyCustomError("Not authorized to delete this link");
+    if (!userLinkId)
+      throw new MyCustomError("Not authorized to delete this link");
     await deleteLinkAndRevalidate(slug, userLinkId);
     return { message: "Link deleted successfully" };
   });
@@ -67,7 +85,8 @@ export const editShortLink = authAction
   .action(async ({ parsedInput: { slug, newLink }, ctx: { user } }) => {
     const existing = await getLinkBySlug(slug);
     if (!existing) throw new MyCustomError("Link not found");
-    if (existing.userLink?.userId !== user.id) throw new MyCustomError("Forbidden");
+    if (existing.userLink?.userId !== user.id)
+      throw new MyCustomError("Forbidden");
 
     // Only check slug availability if slug is changing — checking against the same
     // slug would return true (it's taken by this link) and incorrectly block the edit
@@ -84,7 +103,10 @@ export const editShortLink = authAction
 
     if (newLink.slug !== slug) {
       await redis.del(slug.toLowerCase());
-      await redis.set(newLink.slug.toLowerCase(), encodeURIComponent(newLink.url));
+      await redis.set(
+        newLink.slug.toLowerCase(),
+        encodeURIComponent(newLink.url),
+      );
     } else {
       await redis.set(slug.toLowerCase(), encodeURIComponent(newLink.url));
     }

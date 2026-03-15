@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
-import { eq, sql } from "drizzle-orm";
-
 import { db } from "~/server/db";
 import { userLinks } from "~/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export async function createNewUserLink(userId?: string | null) {
   const [userLink] = await db
@@ -44,7 +43,10 @@ export async function getOrCreateUserLinkById(id: string) {
   return createNewUserLink();
 }
 
-export async function updateUserLink(id: string, data: Partial<typeof userLinks.$inferInsert>) {
+export async function updateUserLink(
+  id: string,
+  data: Partial<typeof userLinks.$inferInsert>,
+) {
   const [updated] = await db
     .update(userLinks)
     .set(data)

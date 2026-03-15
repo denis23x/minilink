@@ -2,16 +2,16 @@
 
 ## Naming
 
-| Thing        | Convention                       | Example                      |
-| ------------ | -------------------------------- | ---------------------------- |
-| Files        | kebab-case                       | `link-card.tsx`              |
-| Components   | PascalCase                       | `LinkCard`                   |
-| Hooks        | camelCase + `use` prefix         | `useMediaQuery`              |
-| Utils        | camelCase                        | `formatNumber`               |
-| Constants    | camelCase (local) / UPPER (env)  | `slugRegex`, `CRON_SECRET`   |
-| Types        | PascalCase, inferred from schema | `ShortLink`, `UserLink`      |
+| Thing        | Convention                                               | Example                    |
+| ------------ | -------------------------------------------------------- | -------------------------- |
+| Files        | kebab-case                                               | `link-card.tsx`            |
+| Components   | PascalCase                                               | `LinkCard`                 |
+| Hooks        | camelCase + `use` prefix                                 | `useMediaQuery`            |
+| Utils        | camelCase                                                | `formatNumber`             |
+| Constants    | camelCase (local) / UPPER (env)                          | `slugRegex`, `CRON_SECRET` |
+| Types        | PascalCase, inferred from schema                         | `ShortLink`, `UserLink`    |
 | DB columns   | snake_case in SQL, camelCase in TS via Drizzle inference |
-| Primary keys | `id` (text, cuid2) or `slug` (text, nanoid 6-char) |
+| Primary keys | `id` (text, cuid2) or `slug` (text, nanoid 6-char)       |
 
 ## File Organization
 
@@ -67,55 +67,45 @@ Enforced by `@ianvs/prettier-plugin-sort-imports` (see `prettier.config.js`):
 
 ```typescript
 // 1. React
-import { useState } from 'react';
-
+import { useState } from "react";
 // 2. Next.js
-import { revalidatePath } from 'next/cache';
-
-// 3. Third-party packages
-import { z } from 'zod';
-
+import { revalidatePath } from "next/cache";
 // 4. ~/types/
-import type { ShortLink } from '~/types';
-
+import type { ShortLink } from "~/types";
+// 3. Third-party packages
+import { z } from "zod";
 // 5. ~/lib/
-import { GUEST_LINK_EXPIRE_TIME } from '~/lib/config';
-import { cn } from '~/lib/utils';
-
+import { GUEST_LINK_EXPIRE_TIME } from "~/lib/config";
+import { cn } from "~/lib/utils";
 // 6. ~/hooks/
-import { useMediaQuery } from '~/hooks/use-media-query';
-
+import { useMediaQuery } from "~/hooks/use-media-query";
 // 7. ~/components/ui/
-import { Button } from '~/components/ui/button';
-
+import { Button } from "~/components/ui/button";
 // 8. ~/components/
-import { LinkCard } from '~/components/links/link-card';
-
+import { LinkCard } from "~/components/links/link-card";
 // 9. ~/styles/
-import '~/styles/globals.css';
-
+import "~/styles/globals.css";
 // 10. Relative imports
-import { something } from './local-module';
+import { something } from "./local-module";
 ```
 
 Path alias: `~/` maps to `src/`.
 
 ## ESLint Rules (`.eslintrc.cjs`)
 
-| Rule | Behavior |
-| ---- | -------- |
-| `consistent-type-imports` | **Enforce** `import type { X }` for type-only imports — never `import { X }` when X is only used as a type |
-| `no-unused-vars` | Warn; `_`-prefixed variables and parameters are exempt |
-| `drizzle/enforce-delete-with-where` | Error on `.delete()` without `.where()` |
-| `drizzle/enforce-update-with-where` | Error on `.update()` without `.where()` |
-| `no-misused-promises` | Error, but `checksVoidReturn.attributes: false` — async JSX event handlers are allowed |
+| Rule                                | Behavior                                                                                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `consistent-type-imports`           | **Enforce** `import type { X }` for type-only imports — never `import { X }` when X is only used as a type |
+| `no-unused-vars`                    | Warn; `_`-prefixed variables and parameters are exempt                                                     |
+| `drizzle/enforce-delete-with-where` | Error on `.delete()` without `.where()`                                                                    |
+| `drizzle/enforce-update-with-where` | Error on `.update()` without `.where()`                                                                    |
+| `no-misused-promises`               | Error, but `checksVoidReturn.attributes: false` — async JSX event handlers are allowed                     |
 
 ```typescript
 // ✅ correct
-import type { ShortLink } from '~/server/db/schema'
-
+import type { ShortLink } from "~/server/db/schema";
 // ❌ wrong — triggers consistent-type-imports
-import { ShortLink } from '~/server/db/schema'
+import { ShortLink } from "~/server/db/schema";
 ```
 
 ## TypeScript Patterns

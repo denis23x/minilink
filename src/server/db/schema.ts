@@ -1,6 +1,11 @@
 import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
-import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 // ─── NextAuth tables ─────────────────────────────────────────────────────────
 
@@ -88,7 +93,10 @@ export const links = sqliteTable("link", {
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const usersRelations = relations(users, ({ one }) => ({
-  userLink: one(userLinks, { fields: [users.id], references: [userLinks.userId] }),
+  userLink: one(userLinks, {
+    fields: [users.id],
+    references: [userLinks.userId],
+  }),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -105,5 +113,8 @@ export const userLinksRelations = relations(userLinks, ({ one, many }) => ({
 }));
 
 export const linksRelations = relations(links, ({ one }) => ({
-  userLink: one(userLinks, { fields: [links.userLinkId], references: [userLinks.id] }),
+  userLink: one(userLinks, {
+    fields: [links.userLinkId],
+    references: [userLinks.id],
+  }),
 }));

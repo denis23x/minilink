@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-
 import { LinkForm } from "~/components/links/link-form";
 import { LinkList, LinkListSkeleton } from "~/components/links/link-list";
 

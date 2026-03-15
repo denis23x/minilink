@@ -1,5 +1,4 @@
 import type { NextRequest } from "next/server";
-
 import { linkMiddleware } from "~/server/middlewares/linkMiddleware";
 
 export default function middleware(request: NextRequest) {
