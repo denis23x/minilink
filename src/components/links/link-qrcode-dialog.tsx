@@ -9,6 +9,7 @@ import {
   ResponsiveDialog,
   ResponsiveDialogBody,
   ResponsiveDialogContent,
+  ResponsiveDialogDescription,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
@@ -90,6 +91,9 @@ export function LinkQRCodeDialog({
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>QR Code</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            Scan or export the QR code for this link
+          </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <ResponsiveDialogBody className="flex flex-col items-center gap-4">
           <QRCodeSVG

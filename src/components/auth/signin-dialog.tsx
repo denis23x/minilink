@@ -6,6 +6,7 @@ import {
   ResponsiveDialog,
   ResponsiveDialogBody,
   ResponsiveDialogContent,
+  ResponsiveDialogDescription,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
@@ -26,9 +27,9 @@ export function SigninDialog() {
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Sign in to Minilink</ResponsiveDialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <ResponsiveDialogDescription>
             Sign in for unlimited link lifespan and extra options
-          </p>
+          </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <ResponsiveDialogBody className="flex flex-col gap-3">
           <OAuthProviderButton provider="google" />

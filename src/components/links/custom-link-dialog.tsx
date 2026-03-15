@@ -6,6 +6,7 @@ import {
   ResponsiveDialog,
   ResponsiveDialogBody,
   ResponsiveDialogContent,
+  ResponsiveDialogDescription,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "~/components/ui/responsive-dialog";
@@ -44,9 +45,9 @@ export function CustomLinkDialog({
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Custom slug</ResponsiveDialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <ResponsiveDialogDescription>
             Enter a custom slug for your link
-          </p>
+          </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <ResponsiveDialogBody className="flex flex-col gap-3">
           <CustomLinkForm onSlugChange={setSlug} initialSlug={initialSlug} />

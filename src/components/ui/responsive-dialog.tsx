@@ -5,6 +5,7 @@ import { useMediaQuery } from "~/hooks/use-media-query";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
@@ -12,7 +13,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerFooter,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
 } from "~/components/ui/drawer";
@@ -101,6 +102,16 @@ export function ResponsiveDialogTitle({
   const { isDesktop } = useContext(ResponsiveDialogContext);
   if (isDesktop) return <DialogTitle>{children}</DialogTitle>;
   return <DrawerTitle>{children}</DrawerTitle>;
+}
+
+export function ResponsiveDialogDescription({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { isDesktop } = useContext(ResponsiveDialogContext);
+  if (isDesktop) return <DialogDescription>{children}</DialogDescription>;
+  return <DrawerDescription>{children}</DrawerDescription>;
 }
 
 // Mobile-only
