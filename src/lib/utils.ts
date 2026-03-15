@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getBaseUrl(): string {
-  if (process.env.DOMAIN_URL) return process.env.DOMAIN_URL;
+  if (process.env.DOMAIN_URL) return process.env.DOMAIN_URL.replace(/\/$/, "");
   return "http://localhost:3000";
 }
 

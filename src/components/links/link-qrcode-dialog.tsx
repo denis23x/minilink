@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
-import { getQRAsCanvas, getQRAsSVGDataUri, QRCodeSVG } from "~/lib/qrcode";
 import { Button } from "~/components/ui/button";
 import {
   ResponsiveDialog,
@@ -19,24 +19,14 @@ interface LinkQRCodeDialogProps {
   trigger: React.ReactNode;
 }
 
+const QR_EXPORT_SIZE = 1024;
+const QR_DISPLAY_SIZE = 256;
+
 export function LinkQRCodeDialog({ shortUrl, trigger }: LinkQRCodeDialogProps) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLAnchorElement>(null);
-
-  async function download(format: "png" | "jpeg" | "svg") {
-    try {
-      if (format === "svg") {
-        const dataUri = getQRAsSVGDataUri({ value: shortUrl, size: 1024 });
-        triggerDownload(dataUri, `qr-${shortUrl}.svg`);
-      } else {
-        const canvas = await getQRAsCanvas({ value: shortUrl, size: 1024 });
-        const dataUrl = canvas.toDataURL(`image/${format}`);
-        triggerDownload(dataUrl, `qr-${shortUrl}.${format}`);
-      }
-    } catch {
-      toast.error("Failed to export QR code");
-    }
-  }
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const svgExportRef = useRef<SVGSVGElement>(null);
 
   function triggerDownload(href: string, filename: string) {
     const a = anchorRef.current;
@@ -46,9 +36,29 @@ export function LinkQRCodeDialog({ shortUrl, trigger }: LinkQRCodeDialogProps) {
     a.click();
   }
 
+  async function download(format: "png" | "jpeg" | "svg") {
+    try {
+      if (format === "svg") {
+        const svg = svgExportRef.current;
+        if (!svg) return;
+        const serialized = new XMLSerializer().serializeToString(svg);
+        const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(serialized)}`;
+        triggerDownload(dataUri, `qr-${shortUrl}.svg`);
+      } else {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const dataUrl = canvas.toDataURL(`image/${format}`);
+        triggerDownload(dataUrl, `qr-${shortUrl}.${format}`);
+      }
+    } catch {
+      toast.error("Failed to export QR code");
+    }
+  }
+
   async function copyPng() {
     try {
-      const canvas = await getQRAsCanvas({ value: shortUrl, size: 1024 });
+      const canvas = canvasRef.current;
+      if (!canvas) throw new Error("Canvas not ready");
       canvas.toBlob(async (blob) => {
         if (!blob) throw new Error("Failed to create blob");
         await navigator.clipboard.write([
@@ -71,7 +81,24 @@ export function LinkQRCodeDialog({ shortUrl, trigger }: LinkQRCodeDialogProps) {
           <ResponsiveDialogTitle>QR Code</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
         <ResponsiveDialogBody className="flex flex-col items-center gap-4 p-4">
-          <QRCodeSVG value={shortUrl} size={256} level="Q" />
+          <QRCodeSVG value={shortUrl} size={QR_DISPLAY_SIZE} level="Q" />
+
+          {/* Hidden elements used for export only */}
+          <QRCodeSVG
+            ref={svgExportRef}
+            value={shortUrl}
+            size={QR_EXPORT_SIZE}
+            level="Q"
+            className="hidden"
+          />
+          <QRCodeCanvas
+            ref={canvasRef}
+            value={shortUrl}
+            size={QR_EXPORT_SIZE}
+            level="Q"
+            className="hidden"
+          />
+
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={copyPng}>
               Copy PNG

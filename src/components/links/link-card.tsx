@@ -42,7 +42,7 @@ export function LinkCard({ link }: LinkCardProps) {
             rel="noopener noreferrer"
             className="truncate text-sm font-medium hover:underline"
           >
-            /{link.slug}
+            {link.slug}
           </a>
           <span className="shrink-0 text-xs text-muted-foreground">
             {formatNumber(link.clicks)} clicks

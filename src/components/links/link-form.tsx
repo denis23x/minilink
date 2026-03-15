@@ -98,7 +98,7 @@ export function LinkForm() {
                 type="button"
                 disabled={!session}
               >
-                {customSlug ? `/${customSlug}` : "Custom link"}
+                {customSlug ? customSlug : "Custom link"}
               </Button>
             }
           />
