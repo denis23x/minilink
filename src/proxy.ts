@@ -1,8 +1,8 @@
-import type { NextRequest } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import { linkMiddleware } from "~/server/middlewares/linkMiddleware";
 
-export default function middleware(request: NextRequest) {
-  return linkMiddleware(request);
+export default function middleware(request: NextRequest, event: NextFetchEvent) {
+  return linkMiddleware(request, event);
 }
 
 export const config = {

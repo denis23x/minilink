@@ -1,11 +1,11 @@
-import type { NextRequest } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { db } from "~/server/db";
 import { links } from "~/server/db/schema";
 import { redis } from "~/server/redis";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
-export async function linkMiddleware(request: NextRequest) {
+export async function linkMiddleware(request: NextRequest, event: NextFetchEvent) {
   const { pathname } = request.nextUrl;
 
   // Pass through home and multi-segment paths
@@ -20,15 +20,17 @@ export async function linkMiddleware(request: NextRequest) {
   const encodedUrl = await redis.get<string>(slug.toLowerCase());
 
   if (encodedUrl) {
-    // Fire-and-forget click increment — don't block the redirect
-    void db
-      .update(links)
-      .set({ clicks: sql`${links.clicks} + 1` })
-      .where(eq(links.slug, slug))
-      .run()
-      .catch((err: unknown) =>
-        console.error("[linkMiddleware] click increment failed", err),
-      );
+    // Use waitUntil so the runtime keeps the function alive until the DB update settles
+    event.waitUntil(
+      db
+        .update(links)
+        .set({ clicks: sql`${links.clicks} + 1` })
+        .where(sql`${links.slug} = ${slug} COLLATE NOCASE`)
+        .run()
+        .catch((err: unknown) =>
+          console.error("[linkMiddleware] click increment failed", err),
+        ),
+    );
 
     return NextResponse.redirect(decodeURIComponent(encodedUrl), {
       status: 302,
