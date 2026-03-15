@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { editShortLink } from "~/server/actions/link";
+import { Edit2, MoreHorizontal, QrCode, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
@@ -13,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Edit2, MoreHorizontal, QrCode, Trash2 } from "lucide-react";
 import { ProtectedElement } from "~/components/ui/protected-element";
 import { CustomLinkDialog } from "~/components/links/custom-link-dialog";
 import { DeleteLinkDialog } from "~/components/links/delete-link-dialog";
@@ -34,6 +34,8 @@ export function LinkOptionsDropdown({
 }: LinkOptionsDropdownProps) {
   const { data: session } = useSession();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const [editSlug, setEditSlug] = useState(slug);
 
   const { execute: executeEdit } = useAction(editShortLink, {
@@ -65,34 +67,21 @@ export function LinkOptionsDropdown({
             session={session ?? null}
             message="Sign in to edit links"
           >
-            <DropdownMenuItem asChild>
-              <CustomLinkDialog
-                onConfirm={handleEditConfirm}
-                onClear={() => setEditSlug(slug)}
-                initialSlug={editSlug}
-                trigger={
-                  <button className="flex w-full items-center gap-2">
-                    <Edit2 className="h-4 w-4" />
-                    Edit
-                  </button>
-                }
-              />
+            <DropdownMenuItem
+              onClick={() => setEditOpen(true)}
+              disabled={!session}
+            >
+              <Edit2 className="h-4 w-4" />
+              Edit
             </DropdownMenuItem>
           </ProtectedElement>
-          <DropdownMenuItem asChild>
-            <LinkQRCodeDialog
-              shortUrl={shortUrl}
-              trigger={
-                <button className="flex w-full items-center gap-2">
-                  <QrCode className="h-4 w-4" />
-                  QR Code
-                </button>
-              }
-            />
+          <DropdownMenuItem onClick={() => setQrOpen(true)}>
+            <QrCode className="h-4 w-4" />
+            QR Code
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-destructive focus:text-destructive"
             onClick={() => setDeleteOpen(true)}
+            className="text-destructive"
           >
             <Trash2 className="h-4 w-4" />
             Delete
@@ -100,6 +89,21 @@ export function LinkOptionsDropdown({
         </DropdownMenuContent>
       </DropdownMenu>
 
+      <CustomLinkDialog
+        open={editOpen}
+        onOpenChange={(next) => {
+          if (!next) setEditSlug(slug);
+          setEditOpen(next);
+        }}
+        onConfirm={handleEditConfirm}
+        onClear={() => setEditSlug(slug)}
+        initialSlug={editSlug}
+      />
+      <LinkQRCodeDialog
+        open={qrOpen}
+        onOpenChange={setQrOpen}
+        shortUrl={shortUrl}
+      />
       <DeleteLinkDialog
         slug={slug}
         open={deleteOpen}

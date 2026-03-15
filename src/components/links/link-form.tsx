@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createShortLink } from "~/server/actions/link";
+import { Settings, WandSparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
@@ -28,6 +29,7 @@ type FormValues = z.infer<typeof schema>;
 export function LinkForm() {
   const { data: session } = useSession();
   const [customSlug, setCustomSlug] = useState("");
+  const [customSlugOpen, setCustomSlugOpen] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -71,6 +73,10 @@ export function LinkForm() {
                 <FormControl>
                   <Input
                     placeholder="https://example.com/very-long-url"
+                    autoComplete="off"
+                    inputMode="url"
+                    spellCheck="false"
+                    autoCapitalize="none"
                     {...field}
                   />
                 </FormControl>
@@ -79,30 +85,33 @@ export function LinkForm() {
             )}
           />
           <Button type="submit" disabled={isPending}>
-            {isPending ? <Loader /> : "Shorten"}
+            {isPending ? <Loader /> : <WandSparkles />} Shorten
           </Button>
-        </div>
-
-        <ProtectedElement
-          session={session ?? null}
-          message="Sign in to use custom slugs"
-        >
+          <ProtectedElement
+            session={session ?? null}
+            message="Sign in to use custom slugs"
+          >
+            <Button
+              variant="outline"
+              size="icon"
+              type="button"
+              disabled={!session}
+              onClick={() => setCustomSlugOpen(true)}
+            >
+              <Settings />
+            </Button>
+          </ProtectedElement>
           <CustomLinkDialog
+            open={customSlugOpen}
+            onOpenChange={(next) => {
+              if (!next) setCustomSlug("");
+              setCustomSlugOpen(next);
+            }}
             onConfirm={setCustomSlug}
             onClear={() => setCustomSlug("")}
             initialSlug={customSlug}
-            trigger={
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                disabled={!session}
-              >
-                {customSlug ? customSlug : "Custom link"}
-              </Button>
-            }
           />
-        </ProtectedElement>
+        </div>
       </form>
     </Form>
   );

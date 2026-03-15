@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { ShortLink } from "~/types";
 import { formatDistanceToNowStrict } from "date-fns";
+import { Calendar, Eye } from "lucide-react";
 import { formatNumber, getBaseUrl } from "~/lib/utils";
 import {
   Tooltip,
@@ -24,13 +25,13 @@ export function LinkCard({ link }: LinkCardProps) {
   const faviconUrl = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${decodedUrl}&size=32`;
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+    <div className="flex items-center gap-3 rounded-lg shadow-sm border hover:border-foreground transition-colors bg-card p-3">
       <Image
         src={faviconUrl}
         alt=""
-        width={20}
-        height={20}
-        className="shrink-0 rounded"
+        width={24}
+        height={24}
+        className="shrink-0 rounded aspect-square"
         unoptimized
       />
 
@@ -40,13 +41,40 @@ export function LinkCard({ link }: LinkCardProps) {
             href={shortUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="truncate text-sm font-medium hover:underline"
+            className="truncate text-sm font-medium underline font-mono"
           >
             {link.slug}
           </a>
-          <span className="shrink-0 text-xs text-muted-foreground">
-            {formatNumber(link.clicks)} clicks
-          </span>
+          <Tooltip>
+            <TooltipTrigger
+              as="p"
+              className="cursor-default flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors bg-transparent border-0 p-0"
+            >
+              <Eye className="h-3 w-3" />
+              <span className="shrink-0">
+                {formatNumber(link?.clicks ?? 0)}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>Total views</TooltipContent>
+          </Tooltip>
+          {link.createdAt && (
+            <Tooltip>
+              <TooltipTrigger
+                as="p"
+                className="cursor-default flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors bg-transparent border-0 p-0"
+              >
+                <Calendar className="h-3 w-3" />
+                <span className="shrink-0">
+                  {formatDistanceToNowStrict(link.createdAt, {
+                    addSuffix: true,
+                  })}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                Created on {link.createdAt.toLocaleDateString()}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <p className="truncate text-xs text-muted-foreground">{decodedUrl}</p>
         {link.description && (
@@ -57,18 +85,6 @@ export function LinkCard({ link }: LinkCardProps) {
       </div>
 
       <div className="flex shrink-0 items-center gap-1">
-        {!isProtected && link.createdAt && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="text-xs text-muted-foreground">
-                {formatDistanceToNowStrict(link.createdAt, { addSuffix: true })}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>
-              {link.createdAt.toLocaleDateString()}
-            </TooltipContent>
-          </Tooltip>
-        )}
         <LinkCopyButton shortUrl={shortUrl} />
         {!isProtected && (
           <LinkOptionsDropdown

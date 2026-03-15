@@ -40,11 +40,12 @@ export function DeleteLinkDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete link?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete <strong>/{slug}</strong> and cannot be
+            This will permanently delete{" "}
+            <strong className="text-foreground">{slug}</strong> and cannot be
             undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex !flex-col gap-2">
           <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={isPending}

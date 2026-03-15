@@ -23,9 +23,18 @@ function Tooltip({
   return <TooltipPrimitive.Root data-slot="tooltip" {...props} />;
 }
 
-function TooltipTrigger({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+type TooltipTriggerProps = React.ComponentProps<typeof TooltipPrimitive.Trigger> & {
+  as?: React.ElementType;
+};
+
+function TooltipTrigger({ as: Comp, ...props }: TooltipTriggerProps) {
+  if (Comp) {
+    return (
+      <TooltipPrimitive.Trigger asChild data-slot="tooltip-trigger">
+        <Comp {...props} />
+      </TooltipPrimitive.Trigger>
+    );
+  }
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 

@@ -21,7 +21,7 @@ export function ProtectedElement({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="cursor-not-allowed opacity-50">{children}</span>
+        <span className="cursor-not-allowed opacity-50 w-fit">{children}</span>
       </TooltipTrigger>
       <TooltipContent>{message}</TooltipContent>
     </Tooltip>

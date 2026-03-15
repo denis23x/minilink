@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { Toaster } from "sonner";
-import { Footer } from "~/components/layout/footer";
 import { Header } from "~/components/layout/header";
 import { Providers } from "~/components/providers";
 import "~/styles/globals.css";
@@ -36,9 +36,13 @@ export default function RootLayout({
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
-          <Footer />
           <Toaster richColors />
         </Providers>
+        <Script
+          src="https://cloud.umami.is/script.js"
+          data-website-id="287d06f6-f083-4252-a413-c8b2b5ed8cc2"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

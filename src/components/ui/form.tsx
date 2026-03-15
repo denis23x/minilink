@@ -3,6 +3,7 @@
 import { createContext, forwardRef, useContext, useId } from "react";
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
+import { Slot } from "radix-ui";
 import { cn } from "~/lib/utils";
 import { Label } from "~/components/ui/label";
 
@@ -79,13 +80,13 @@ const FormLabel = forwardRef<
 FormLabel.displayName = "FormLabel";
 
 const FormControl = forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  React.ElementRef<typeof Slot.Root>,
+  React.ComponentPropsWithoutRef<typeof Slot.Root>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
   return (
-    <div
+    <Slot.Root
       ref={ref}
       id={formItemId}
       aria-describedby={
@@ -125,7 +126,7 @@ const FormMessage = forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-destructive", className)}
+      className={cn("text-sm font-normal text-destructive", className)}
       {...props}
     >
       {body}

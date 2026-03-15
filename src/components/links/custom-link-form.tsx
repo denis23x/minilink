@@ -5,7 +5,6 @@ import { checkSlug } from "~/server/actions/link";
 import { useAction } from "next-safe-action/hooks";
 import { useDebounce } from "~/hooks/use-debounce";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 
 interface CustomLinkFormProps {
   onSlugChange: (slug: string) => void;
@@ -37,7 +36,6 @@ export function CustomLinkForm({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor="custom-slug">Custom slug</Label>
       <Input
         id="custom-slug"
         placeholder="my-link"

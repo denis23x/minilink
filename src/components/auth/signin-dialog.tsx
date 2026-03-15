@@ -19,17 +19,20 @@ export function SigninDialog() {
   return (
     <ResponsiveDialog open={open} onOpenChange={setOpen}>
       <ResponsiveDialogTrigger>
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <Button variant="outline" onClick={() => setOpen(true)}>
           Sign in
         </Button>
       </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Sign in to Minilink</ResponsiveDialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Sign in for unlimited link lifespan and extra options
+          </p>
         </ResponsiveDialogHeader>
-        <ResponsiveDialogBody className="flex flex-col gap-3 p-4">
-          <OAuthProviderButton provider="github" />
+        <ResponsiveDialogBody className="flex flex-col gap-3">
           <OAuthProviderButton provider="google" />
+          <OAuthProviderButton provider="github" />
         </ResponsiveDialogBody>
         <ResponsiveDialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>

@@ -44,8 +44,9 @@ export function OAuthProviderButton({ provider }: OAuthProviderButtonProps) {
 
   return (
     <Button
-      variant="outline"
+      variant={provider === "github" ? "default" : "outline"}
       className="w-full gap-2"
+      size="lg"
       onClick={() => signIn(provider)}
     >
       <Icon className="h-4 w-4" />

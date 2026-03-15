@@ -109,9 +109,7 @@ export function ResponsiveDialogFooter({
 }: {
   children: React.ReactNode;
 }) {
-  const { isDesktop } = useContext(ResponsiveDialogContext);
-  if (isDesktop) return null;
-  return <DrawerFooter>{children}</DrawerFooter>;
+  return null;
 }
 
 export function ResponsiveDialogClose({

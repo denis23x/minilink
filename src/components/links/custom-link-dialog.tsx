@@ -5,69 +5,57 @@ import { Button } from "~/components/ui/button";
 import {
   ResponsiveDialog,
   ResponsiveDialogBody,
-  ResponsiveDialogClose,
   ResponsiveDialogContent,
-  ResponsiveDialogFooter,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
-  ResponsiveDialogTrigger,
 } from "~/components/ui/responsive-dialog";
 import { CustomLinkForm } from "~/components/links/custom-link-form";
 
 interface CustomLinkDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onConfirm: (slug: string) => void;
   onClear: () => void;
-  trigger: React.ReactNode;
   initialSlug?: string;
 }
 
 export function CustomLinkDialog({
+  open,
+  onOpenChange,
   onConfirm,
   onClear,
-  trigger,
   initialSlug,
 }: CustomLinkDialogProps) {
-  const [open, setOpen] = useState(false);
   const [slug, setSlug] = useState(initialSlug ?? "");
 
   function handleConfirm() {
     onConfirm(slug);
-    setOpen(false);
+    onOpenChange(false);
   }
 
   function handleOpenChange(next: boolean) {
     // Clear slug if dialog closes without confirming
     if (!next) onClear();
-    setOpen(next);
+    onOpenChange(next);
   }
 
   return (
     <ResponsiveDialog open={open} onOpenChange={handleOpenChange}>
-      <ResponsiveDialogTrigger>
-        <span onClick={() => setOpen(true)}>{trigger}</span>
-      </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Custom slug</ResponsiveDialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Enter a custom slug for your link
+          </p>
         </ResponsiveDialogHeader>
-        <ResponsiveDialogBody className="p-4">
+        <ResponsiveDialogBody className="flex flex-col gap-3">
           <CustomLinkForm onSlugChange={setSlug} initialSlug={initialSlug} />
-        </ResponsiveDialogBody>
-        <div className="flex justify-end gap-2 p-4 pt-0">
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleConfirm} disabled={!slug}>
-            Confirm
-          </Button>
-        </div>
-        <ResponsiveDialogFooter>
-          <ResponsiveDialogClose>
-            <Button variant="outline" className="w-full">
-              Cancel
+          <div className="flex flex-col justify-end gap-3">
+            <Button onClick={handleConfirm} disabled={!slug}>
+              Confirm
             </Button>
-          </ResponsiveDialogClose>
-        </ResponsiveDialogFooter>
+          </div>
+        </ResponsiveDialogBody>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   );
