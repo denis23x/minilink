@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "drizzle-orm": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "9aea7469d696c9b5fa54a84b7a92ea692872fb624fb028f866ab0f3deac84867"
+    },
+    "nextjs-app-router-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "d2f0a7065f7418fdb3ae88559f1f1426f40c26f2b5aebcd394797418d4bb3b04"
+    },
+    "redis-best-practices": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "c362f644a6e3ed9b69a86fef4aa41ebcb4ff15552f03b7431f00642af5d3d5f1"
+    },
+    "redis-js": {
+      "source": "upstash/redis-js",
+      "sourceType": "github",
+      "computedHash": "f963cad25daccb7f45a90d0a0ab65f329234f0c97d17555ee8bc28c7501fa43b"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "1ec42c9b918b315d8e5c6c856b78c3c4725fc93dea30b9b7e9975c69848fcce6"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
+    }
+  }
+}
