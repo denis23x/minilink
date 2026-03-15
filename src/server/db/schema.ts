@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   integer,
   primaryKey,
@@ -73,7 +73,7 @@ export const userLinks = sqliteTable("userLink", {
   userId: text("userId").references(() => users.id, { onDelete: "cascade" }),
   totalLinks: integer("total_links").default(0).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date(sql`(strftime('%s', 'now'))` as unknown as number),
+    () => new Date(Math.floor(Date.now() / 1000) * 1000),
   ),
 });
 
@@ -86,7 +86,7 @@ export const links = sqliteTable("link", {
   url: text("url").notNull(),
   clicks: integer("clicks").default(0).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date(sql`(strftime('%s', 'now'))` as unknown as number),
+    () => new Date(Math.floor(Date.now() / 1000) * 1000),
   ),
 });
 
