@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { Check, Copy } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Icons, iconVariants } from "~/components/ui/icons";
 
 interface LinkCopyButtonProps {
   shortUrl: string;
@@ -31,9 +31,9 @@ export function LinkCopyButton({ shortUrl }: LinkCopyButtonProps) {
       aria-label="Copy link"
     >
       {copied ? (
-        <Icons.check className={iconVariants({ size: "sm" })} />
+        <Check className="h-4 w-4" />
       ) : (
-        <Icons.copy className={iconVariants({ size: "sm" })} />
+        <Copy className="h-4 w-4" />
       )}
     </Button>
   );

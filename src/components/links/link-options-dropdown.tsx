@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Icons, iconVariants } from "~/components/ui/icons";
+import { Edit2, MoreHorizontal, QrCode, Trash2 } from "lucide-react";
 import { ProtectedElement } from "~/components/ui/protected-element";
 import { CustomLinkDialog } from "~/components/links/custom-link-dialog";
 import { DeleteLinkDialog } from "~/components/links/delete-link-dialog";
@@ -57,7 +57,7 @@ export function LinkOptionsDropdown({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label="Link options">
-            <Icons.moreHorizontal className={iconVariants({ size: "sm" })} />
+            <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -72,7 +72,7 @@ export function LinkOptionsDropdown({
                 initialSlug={editSlug}
                 trigger={
                   <button className="flex w-full items-center gap-2">
-                    <Icons.edit className={iconVariants({ size: "sm" })} />
+                    <Edit2 className="h-4 w-4" />
                     Edit
                   </button>
                 }
@@ -84,7 +84,7 @@ export function LinkOptionsDropdown({
               shortUrl={shortUrl}
               trigger={
                 <button className="flex w-full items-center gap-2">
-                  <Icons.qrCode className={iconVariants({ size: "sm" })} />
+                  <QrCode className="h-4 w-4" />
                   QR Code
                 </button>
               }
@@ -94,7 +94,7 @@ export function LinkOptionsDropdown({
             className="text-destructive focus:text-destructive"
             onClick={() => setDeleteOpen(true)}
           >
-            <Icons.trash className={iconVariants({ size: "sm" })} />
+            <Trash2 className="h-4 w-4" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
