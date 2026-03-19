@@ -103,10 +103,7 @@ export function LinkForm() {
           </ProtectedElement>
           <CustomLinkDialog
             open={customSlugOpen}
-            onOpenChange={(next) => {
-              if (!next) setCustomSlug("");
-              setCustomSlugOpen(next);
-            }}
+            onOpenChange={setCustomSlugOpen}
             onConfirm={setCustomSlug}
             onClear={() => setCustomSlug("")}
             initialSlug={customSlug}

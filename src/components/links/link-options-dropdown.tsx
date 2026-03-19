@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { editShortLink } from "~/server/actions/link";
 import { Edit2, MoreHorizontal, QrCode, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useAction } from "next-safe-action/hooks";
-import { toast } from "sonner";
-import type { InsertLinkInput } from "~/lib/validations/link";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -15,8 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { ProtectedElement } from "~/components/ui/protected-element";
-import { CustomLinkDialog } from "~/components/links/custom-link-dialog";
 import { DeleteLinkDialog } from "~/components/links/delete-link-dialog";
+import { EditLinkDialog } from "~/components/links/edit-link-dialog";
 import { LinkQRCodeDialog } from "~/components/links/link-qrcode-dialog";
 
 interface LinkOptionsDropdownProps {
@@ -36,23 +32,6 @@ export function LinkOptionsDropdown({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
-  const [editSlug, setEditSlug] = useState(slug);
-
-  const { execute: executeEdit } = useAction(editShortLink, {
-    onSuccess: () => toast.success("Link updated"),
-    onError: ({ error }) =>
-      toast.error(error.serverError ?? "Failed to update link"),
-  });
-
-  function handleEditConfirm(newSlug: string) {
-    const newLink: InsertLinkInput = {
-      slug: newSlug,
-      url: decodeURIComponent(url),
-      description: description ?? undefined,
-    };
-    executeEdit({ slug, newLink });
-    setEditSlug(newSlug);
-  }
 
   return (
     <>
@@ -89,15 +68,12 @@ export function LinkOptionsDropdown({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <CustomLinkDialog
+      <EditLinkDialog
+        slug={slug}
+        url={url}
+        description={description}
         open={editOpen}
-        onOpenChange={(next) => {
-          if (!next) setEditSlug(slug);
-          setEditOpen(next);
-        }}
-        onConfirm={handleEditConfirm}
-        onClear={() => setEditSlug(slug)}
-        initialSlug={editSlug}
+        onOpenChange={setEditOpen}
       />
       <LinkQRCodeDialog
         open={qrOpen}
