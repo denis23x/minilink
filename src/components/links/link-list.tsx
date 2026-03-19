@@ -20,10 +20,10 @@ export async function LinkList() {
   }
 
   // Show example "github" link when guest has no links
-  if (!session && links.length === 0) {
+  if (!session) {
     const exampleLink = await getLinkBySlug("github");
     if (exampleLink) {
-      links = [exampleLink];
+      links = [exampleLink, ...links];
     }
   }
 
@@ -35,7 +35,7 @@ export async function LinkList() {
     );
   }
 
-  const showGuestBanner = !session && !!userLinkIdCookie && links.length > 0;
+  const showGuestBanner = !session && !!userLinkIdCookie && links.length > 1;
 
   return (
     <div className="flex flex-col gap-4">
