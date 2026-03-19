@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Copy, Download } from "lucide-react";
 import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
@@ -24,6 +24,27 @@ interface LinkQRCodeDialogProps {
 const QR_EXPORT_SIZE = 1024;
 const QR_DISPLAY_SIZE = 256;
 
+function useQRColors() {
+  const read = () => {
+    const s = getComputedStyle(document.documentElement);
+    return {
+      bgColor: s.getPropertyValue("--background").trim(),
+      fgColor: s.getPropertyValue("--primary").trim(),
+    };
+  };
+
+  const [colors, setColors] = useState({ bgColor: "#ffffff", fgColor: "#000000" });
+
+  useEffect(() => {
+    setColors(read());
+    const observer = new MutationObserver(() => setColors(read()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  return colors;
+}
+
 export function LinkQRCodeDialog({
   shortUrl,
   open,
@@ -33,6 +54,7 @@ export function LinkQRCodeDialog({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgExportRef = useRef<SVGSVGElement>(null);
   const marginSize = 2;
+  const { bgColor, fgColor } = useQRColors();
 
   function triggerDownload(href: string, filename: string) {
     const a = anchorRef.current;
@@ -102,6 +124,8 @@ export function LinkQRCodeDialog({
             marginSize={marginSize}
             className="rounded-lg border w-full h-auto"
             level="Q"
+            bgColor={bgColor}
+            fgColor={fgColor}
           />
 
           {/* Hidden elements used for export only */}
@@ -112,6 +136,8 @@ export function LinkQRCodeDialog({
             level="Q"
             className="hidden"
             marginSize={marginSize}
+            bgColor={bgColor}
+            fgColor={fgColor}
           />
           <QRCodeCanvas
             ref={canvasRef}
@@ -120,6 +146,8 @@ export function LinkQRCodeDialog({
             level="Q"
             className="hidden"
             marginSize={marginSize}
+            bgColor={bgColor}
+            fgColor={fgColor}
           />
 
           <div className="flex flex-wrap gap-2">
