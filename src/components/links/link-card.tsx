@@ -78,9 +78,7 @@ export function LinkCard({ link }: LinkCardProps) {
         </div>
         <p className="truncate text-xs text-muted-foreground">{decodedUrl}</p>
         {link.description && (
-          <p className="truncate text-xs text-muted-foreground">
-            {link.description}
-          </p>
+          <p className="text-xs text-foreground">{link.description}</p>
         )}
       </div>
 
