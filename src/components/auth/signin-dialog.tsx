@@ -14,16 +14,26 @@ import {
 } from "~/components/ui/responsive-dialog";
 import { OAuthProviderButton } from "~/components/auth/oauth-provider-button";
 
-export function SigninDialog() {
-  const [open, setOpen] = useState(false);
+interface SigninDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function SigninDialog({ open: controlledOpen, onOpenChange: controlledOnOpenChange }: SigninDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
 
   return (
     <ResponsiveDialog open={open} onOpenChange={setOpen}>
-      <ResponsiveDialogTrigger>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Sign in
-        </Button>
-      </ResponsiveDialogTrigger>
+      {!controlledOnOpenChange && (
+        <ResponsiveDialogTrigger>
+          <Button variant="outline" onClick={() => setOpen(true)}>
+            Sign in
+          </Button>
+        </ResponsiveDialogTrigger>
+      )}
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Sign in to Minilink</ResponsiveDialogTitle>

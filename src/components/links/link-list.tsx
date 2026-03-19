@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { getLinkBySlug, getLinksByUserLinkId } from "~/server/api/link";
 import { getUserLinkByUserId } from "~/server/api/user-link";
 import { getServerAuthSession } from "~/server/auth";
+import { GuestBanner } from "~/components/links/guest-banner";
 import { LinkCard } from "~/components/links/link-card";
 
 export async function LinkList() {
@@ -34,11 +35,16 @@ export async function LinkList() {
     );
   }
 
+  const showGuestBanner = !session && !!userLinkIdCookie && links.length > 0;
+
   return (
-    <div className="flex flex-col gap-2">
-      {links.map((link) => (
-        <LinkCard key={link.slug} link={link} />
-      ))}
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        {links.map((link) => (
+          <LinkCard key={link.slug} link={link} />
+        ))}
+      </div>
+      {showGuestBanner && <GuestBanner />}
     </div>
   );
 }
