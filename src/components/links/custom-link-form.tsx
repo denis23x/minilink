@@ -8,31 +8,48 @@ import { Input } from "~/components/ui/input";
 
 interface CustomLinkFormProps {
   onSlugChange: (slug: string) => void;
+  onStatusChange?: (status: "idle" | "taken" | "available") => void;
   initialSlug?: string;
+  excludeSlug?: string;
 }
 
 export function CustomLinkForm({
   onSlugChange,
+  onStatusChange,
   initialSlug = "",
+  excludeSlug,
 }: CustomLinkFormProps) {
   const [slug, setSlug] = useState(initialSlug);
   const debouncedSlug = useDebounce(slug, 400);
 
-  const { execute, result, isPending } = useAction(checkSlug);
+  const { execute, result, isPending } = useAction(checkSlug, {
+    onSuccess: ({ data }) => {
+      onStatusChange?.(data?.taken ? "taken" : "available");
+    },
+  });
 
   useEffect(() => {
-    if (debouncedSlug) {
+    if (debouncedSlug && debouncedSlug !== excludeSlug) {
       execute({ slug: debouncedSlug });
     }
-  }, [debouncedSlug, execute]);
+  }, [debouncedSlug, excludeSlug, execute]);
+
+  useEffect(() => {
+    if (!debouncedSlug || debouncedSlug === excludeSlug) {
+      onStatusChange?.("idle");
+    }
+  }, [debouncedSlug, excludeSlug, onStatusChange]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSlug(e.target.value);
     onSlugChange(e.target.value);
   }
 
-  const isTaken = result.data?.taken === true;
-  const isAvailable = debouncedSlug && result.data?.taken === false;
+  const isTaken = debouncedSlug !== excludeSlug && result.data?.taken === true;
+  const isAvailable =
+    debouncedSlug !== excludeSlug &&
+    !!debouncedSlug &&
+    result.data?.taken === false;
 
   return (
     <div className="flex flex-col gap-2">
@@ -41,8 +58,13 @@ export function CustomLinkForm({
         placeholder="my-link"
         value={slug}
         onChange={handleChange}
+        disabled={isPending}
         className={
-          isTaken ? "border-destructive" : isAvailable ? "border-green-500" : ""
+          isTaken
+            ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/40"
+            : isAvailable
+              ? "border-green-500 focus-visible:border-green-500 focus-visible:ring-green-500/40"
+              : ""
         }
       />
       {isPending && (

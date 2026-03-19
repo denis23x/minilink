@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createShortLink } from "~/server/actions/link";
-import { Settings, WandSparkles } from "lucide-react";
+import { Check, Settings, WandSparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
@@ -98,7 +98,7 @@ export function LinkForm() {
               disabled={!session}
               onClick={() => setCustomSlugOpen(true)}
             >
-              <Settings />
+              {customSlug ? <Check /> : <Settings />}
             </Button>
           </ProtectedElement>
           <CustomLinkDialog

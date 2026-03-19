@@ -19,6 +19,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Minilink — URL Shortener",
   description: "A fast, minimal URL shortener.",
+  metadataBase: new URL(process.env.DOMAIN_URL ?? "http://localhost:3000"),
+  openGraph: {
+    title: "Minilink — URL Shortener",
+    description: "A fast, minimal URL shortener.",
+    url: "/",
+    siteName: "Minilink",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Minilink — URL Shortener",
+    description: "A fast, minimal URL shortener.",
+  },
 };
 
 export default function RootLayout({

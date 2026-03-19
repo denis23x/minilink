@@ -36,7 +36,10 @@ export function CustomLinkDialog({
 
   function handleOpenChange(next: boolean) {
     // Clear slug if dialog closes without confirming
-    if (!next) onClear();
+    if (!next) {
+      onClear();
+      setSlug(initialSlug ?? "");
+    }
     onOpenChange(next);
   }
 

@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useDebounce } from "~/hooks/use-debounce";
 import { setFormErrors } from "~/lib/utils";
 import { insertLinkSchema, type InsertLinkInput } from "~/lib/validations/link";
-import { checkSlug, editShortLink } from "~/server/actions/link";
+import { editShortLink } from "~/server/actions/link";
+import { CustomLinkForm } from "~/components/links/custom-link-form";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -65,22 +65,6 @@ export function EditLinkDialog({
       setSlugStatus("idle");
     }
   }, [open, slug, url, description, form]);
-
-  const watchedSlug = form.watch("slug");
-  const debouncedSlug = useDebounce(watchedSlug, 400);
-
-  const { execute: checkSlugAvailability } = useAction(checkSlug, {
-    onSuccess: ({ data }) =>
-      setSlugStatus(data?.taken ? "taken" : "available"),
-  });
-
-  useEffect(() => {
-    if (debouncedSlug && debouncedSlug !== slug) {
-      checkSlugAvailability({ slug: debouncedSlug });
-    } else {
-      setSlugStatus("idle");
-    }
-  }, [debouncedSlug, slug, checkSlugAvailability]);
 
   const { execute: executeEdit, isPending } = useAction(editShortLink, {
     onSuccess: () => {
@@ -156,27 +140,16 @@ export function EditLinkDialog({
               <FormField
                 control={form.control}
                 name="slug"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
-                    <FormLabel>Slug</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="my-link"
-                        aria-invalid={slugStatus === "taken" || undefined}
-                        className={
-                          slugStatus === "available" ? "border-green-500" : ""
-                        }
-                        {...field}
-                      />
-                    </FormControl>
-                    {slugStatus === "taken" && (
-                      <p className="text-xs text-destructive">
-                        Slug is already taken
-                      </p>
-                    )}
-                    {slugStatus === "available" && (
-                      <p className="text-xs text-green-500">Slug is available</p>
-                    )}
+                    <FormLabel htmlFor="custom-slug">Slug</FormLabel>
+                    <CustomLinkForm
+                      key={open ? slug : ""}
+                      initialSlug={slug}
+                      excludeSlug={slug}
+                      onSlugChange={(v) => form.setValue("slug", v)}
+                      onStatusChange={setSlugStatus}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
